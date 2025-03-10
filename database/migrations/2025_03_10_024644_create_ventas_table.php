@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('ventas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('boleto_id')->constrained()->onDelete('cascade');
             $table->foreignId('cliente_id')->constrained()->onDelete('cascade');
-            $table->decimal('monto', 8, 2);
-            $table->enum('estado_pago', ['pendiente', 'completado', 'reembolsado'])->default('pendiente');
-            $table->string('metodo_pago')->nullable();
-            $table->string('referencia_pago')->nullable();
+            $table->decimal('total', 10, 2);
+            $table->string('metodo_pago');
+            $table->enum('estado', ['pendiente', 'pagado', 'cancelado'])->default('pendiente');
+            $table->string('referencia')->unique();
             $table->timestamps();
         });
     }

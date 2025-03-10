@@ -22,6 +22,12 @@ class Rifa extends Model implements HasMedia
         'estado'
     ];
 
+    protected $casts = [
+        'fecha_sorteo' => 'datetime',
+    ];
+
+    protected $appends = ['boletos_disponibles'];
+
     public function boletos()
     {
         return $this->hasMany(Boleto::class);
@@ -35,5 +41,10 @@ class Rifa extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('fotos');
+    }
+
+    public function getBoletosDisponiblesAttribute()
+    {
+        return $this->boletos()->where('estado', 'disponible')->count();
     }
 }
