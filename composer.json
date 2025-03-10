@@ -8,8 +8,11 @@
     "require": {
         "php": "^8.2",
         "filament/filament": "^3.3",
+        "filament/spatie-laravel-media-library-plugin": "^3.3",
+        "ibrahimbougaoua/filawidget": "v0.2-beta",
         "laravel/framework": "^11.31",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "miguilim/filament-auto-panel": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -65,7 +68,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "stable",
