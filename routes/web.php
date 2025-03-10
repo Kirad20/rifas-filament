@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\RifaController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
@@ -11,7 +12,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/rifas', [HomeController::class, 'listarRifas'])->name('rifas');
 Route::get('/rifas/{rifa}', [HomeController::class, 'mostrarRifa'])->name('rifas.show');
 Route::get('/contacto', [ContactController::class, 'index'])->name('contacto');
-
+Route::get('/rifas/filtro', [RifaController::class, 'filter'])->name('rifas.filter');
 
 // Rutas para boletos
 Route::get('/boletos/seleccionar/{rifa}', [BoletoController::class, 'seleccionarBoletos'])->name('boletos.seleccionar');
