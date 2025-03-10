@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "dutchcodingcompany/filament-developer-logins": "^1.8",
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "ibrahimbougaoua/filawidget": "v0.2-beta",
