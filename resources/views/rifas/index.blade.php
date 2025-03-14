@@ -81,7 +81,26 @@
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition hover:scale-105 hover:shadow-xl"
                     data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                     <div class="relative">
-                        <img src="{{ $rifa->imagen_url }}" alt="{{ $rifa->nombre }}" class="w-full h-64 object-cover">
+                        @if ($rifa->hasMedia('fotos'))
+                            <div class="swiper rifa-swiper-{{ $rifa->id }}">
+                                <div class="swiper-wrapper">
+                                    @foreach ($rifa->getMedia('fotos') as $foto)
+                                        <div class="swiper-slide">
+                                            <img src="{{ $foto->getUrl() }}" alt="{{ $rifa->nombre }}"
+                                                class="w-full h-64 object-cover">
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <!-- Botones de navegación -->
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-button-prev"></div>
+                                <!-- Paginación -->
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        @else
+                            <img src="{{ asset('images/default-rifa.jpg') }}" alt="{{ $rifa->nombre }}"
+                                class="w-full h-64 object-cover">
+                        @endif
 
                         @if ($rifa->es_popular)
                             <div
@@ -150,5 +169,30 @@
         function updatePriceValue(val) {
             document.getElementById('precio_value').innerText = '$' + new Intl.NumberFormat('es-MX').format(val);
         }
+
+        // Inicializar los carruseles de Swiper cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            @foreach ($rifasActivas as $rifa)
+                @if ($rifa->hasMedia('fotos'))
+                    new Swiper('.rifa-swiper-{{ $rifa->id }}', {
+                        slidesPerView: 1,
+                        spaceBetween: 0,
+                        loop: true,
+                        autoplay: {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                        },
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        },
+                    });
+                @endif
+            @endforeach
+        });
     </script>
 @endsection

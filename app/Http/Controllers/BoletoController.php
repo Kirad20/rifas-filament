@@ -20,6 +20,19 @@ class BoletoController extends Controller
 
         // Obtener carrito actual para mostrar contador
         $carrito = Session::get('carrito', []);
+
+        // Verificar si hay boletos en el carrito que ya no están disponibles
+        if (!empty($carrito)) {
+            $boletosDisponiblesIds = $boletosDisponibles->pluck('id')->toArray();
+            foreach ($carrito as $index => $item) {
+                if (!in_array($item['id'], $boletosDisponiblesIds)) {
+                    unset($carrito[$index]);
+                }
+            }
+            $carrito = array_values($carrito); // Reindexar el array
+            Session::put('carrito', $carrito);
+        }
+
         $totalEnCarrito = count($carrito);
 
         return view('boletos.seleccionar', compact('rifa', 'boletosDisponibles', 'totalEnCarrito'));
@@ -62,6 +75,16 @@ class BoletoController extends Controller
     public function verCarrito()
     {
         $carrito = Session::get('carrito', []);
+
+        // Verificar y eliminar boletos reservados que ya no están disponibles
+        foreach ($carrito as $index => $item) {
+            $boleto = Boleto::find($item['id']);
+            if (!$boleto || $boleto->estado !== 'disponible') {
+                unset($carrito[$index]);
+            }
+        }
+        $carrito = array_values($carrito); // Reindexar el array
+        Session::put('carrito', $carrito);
         $total = array_sum(array_column($carrito, 'precio'));
 
         return view('boletos.carrito', compact('carrito', 'total'));

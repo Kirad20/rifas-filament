@@ -21,6 +21,10 @@
     <!-- AOS Animation Library -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
+    <!-- Añadir en la sección head -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -56,6 +60,25 @@
 
         .dark {
             color-scheme: dark;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #F59E0B !important;
+            /* Color ámbar para botones de navegación */
+            --swiper-navigation-size: 24px;
+            /* Tamaño más pequeño para los botones */
+        }
+
+        .swiper-pagination-bullet-active {
+            background-color: #F59E0B !important;
+            /* Color ámbar para la paginación activa */
+        }
+
+        .swiper-container {
+            border-radius: 12px 12px 0 0;
+            /* Bordes redondeados superiores */
+            overflow: hidden;
         }
     </style>
 </head>
