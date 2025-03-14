@@ -70,7 +70,10 @@ class AdminPanelProvider extends PanelProvider
                     ->users([
                         'Admin' => 'admin@admin.com',
                         'User' => 'user@example.com',
-                    ])
+                    ]),
+                \TomatoPHP\FilamentSettingsHub\FilamentSettingsHubPlugin::make()
+                    ->allowSiteSettings()
+                    ->allowSocialMenuSettings()
             ]);
     }
 }
