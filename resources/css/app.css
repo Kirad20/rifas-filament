@@ -2,4 +2,9 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Importaciones de vendor */
+@import './vendor/fontawesome.css';
+@import './vendor/aos.css';
+@import './vendor/swiper.css';
+
 /* Si tienes otras importaciones o estilos específicos, puedes mantenerlos aquí */

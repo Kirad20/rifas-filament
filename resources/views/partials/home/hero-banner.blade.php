@@ -10,10 +10,9 @@
         <div class="md:w-3/5 mx-auto text-center">
             <span class="inline-block bg-white/20 px-4 py-1 rounded-full text-sm font-medium backdrop-blur-sm mb-6">La
                 mejor plataforma de sorteos</span>
-            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">¡Participa y Gana con <span
-                    class="text-primary">Concursos y Sorteos San Miguel</span>!</h1>
-            <p class="text-xl md:text-2xl mb-10 text-white/90">La plataforma de rifas en línea con premios increíbles,
-                resultados transparentes y la mejor experiencia para nuestros usuarios.</p>
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">Participa y Gana con <span
+                    class="text-primary">Sorteos y Concursos San Miguel</span></h1>
+            <p class="text-xl md:text-2xl mb-10 text-white/90">Tu plataforma de rifas y concursos en línea más transparente, segura y confiable, donde puedes ganar increíbles premios desde tan solo $1 MXN.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('rifas') }}"
                     class="bg-white text-accent px-8 py-4 rounded-lg font-bold hover:bg-primary-light hover:text-accent transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">

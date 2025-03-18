@@ -90,6 +90,13 @@ return [
             'driver' => 'octane',
         ],
 
+        'static' => [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/static'),
+            'lock_path' => storage_path('framework/cache/static'),
+            'ttl' => env('STATIC_RESOURCES_CACHE_TIME', 2592000), // 30 días por defecto
+        ],
+
     ],
 
     /*

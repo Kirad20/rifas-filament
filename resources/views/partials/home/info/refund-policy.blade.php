@@ -8,34 +8,19 @@
     </div>
 
     <div class="prose max-w-none">
-        <p class="text-text dark:text-text-light/80 mb-4">Entendemos que las circunstancias pueden cambiar, por lo que ofrecemos
-            opciones de devolución bajo las siguientes condiciones:</p>
+        <p class="text-text dark:text-text-light/80 mb-4">En Sorteos y Concursos San Miguel, tenemos una política clara respecto a las devoluciones:</p>
 
         <ul class="space-y-3 text-text dark:text-text-light/80">
             <li class="flex items-center">
-                <div class="text-primary mr-2 flex-shrink-0">✓</div>
-                Se puede solicitar devolución hasta 48 horas antes del sorteo, sin excepción.
-            </li>
-            <li class="flex items-center">
-                <div class="text-primary mr-2 flex-shrink-0">✓</div>
-                La devolución se realizará al mismo método de pago utilizado en la compra original.
-            </li>
-            <li class="flex items-center">
-                <div class="text-primary mr-2 flex-shrink-0">✓</div>
-                El proceso de devolución puede tardar de 5 a 10 días hábiles en ser efectivo en su cuenta.
-            </li>
-            <li class="flex items-center">
-                <div class="text-primary mr-2 flex-shrink-0">✓</div>
-                Para solicitar una devolución, contacte a nuestro servicio de atención al cliente vía correo
-                electrónico o teléfono.
+                <div class="text-primary mr-2 flex-shrink-0">📌</div>
+                No se realizan reembolsos una vez efectuada la compra del boleto.
             </li>
         </ul>
 
         <div class="mt-6 flex items-center bg-primary-light/20 dark:bg-primary/20 p-4 rounded-lg border-l-4 border-primary">
             <div class="text-2xl text-primary mr-3 flex-shrink-0">⚠️</div>
             <p class="text-sm text-accent dark:text-primary-light/90">
-                <strong>Importante:</strong> No se aceptan solicitudes de devolución menos de 48 horas antes del
-                sorteo, el día del sorteo, ni después de realizado el mismo.
+                <strong>Importante:</strong> Al adquirir un boleto, los concursantes aceptan automáticamente nuestras reglas, términos y condiciones, incluyendo la política de no reembolsos.
             </p>
         </div>
     </div>

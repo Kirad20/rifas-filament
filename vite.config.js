@@ -6,7 +6,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/css/theme.css', // Añadir el nuevo archivo CSS
+                'resources/css/theme.css',
                 'resources/js/app.js',
             ],
             refresh: true,
@@ -14,7 +14,6 @@ export default defineConfig({
     ],
     build: {
         manifest: true,
-        outDir: 'public/build', // <- Asegura que Vite genere los archivos en esta ruta
+        outDir: 'public/build',
     }
-},
-);
+});
