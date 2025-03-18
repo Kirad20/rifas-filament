@@ -1,5 +1,5 @@
 <!-- Hero Banner con overlay y diseño mejorado -->
-<div class="relative bg-gradient-to-r from-accent to-secondary text-white overflow-hidden">
+<div class="relative bg-gradient-to-r from-accent to-secondary text-white overflow-hidden home-partial-view" style="color: var(--text-light) !important;">
     <!-- Patrón de fondo para dar textura usando CSS en lugar de SVG -->
     <div class="absolute inset-0 opacity-10"
          style="background-image: radial-gradient(circle, currentColor 1px, transparent 1px);

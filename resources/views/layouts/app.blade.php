@@ -3,8 +3,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <title>@yield('title', 'Rifas Online') - Concursos y Sorteos San Miguel</title>
 
@@ -16,7 +19,30 @@
         rel="stylesheet">
 
     <!-- Scripts y estilos compilados -->
-    @vite(['resources/css/app.css', 'resources/css/theme.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Agregar un CSS específico para móviles con media queries -->
+    <style>
+        @media (max-width: 768px) {
+            .home-partial-view {
+                --text-color: var(--text-color) !important;
+                --text-light: var(--text-light) !important;
+                --primary-color: var(--primary-color) !important;
+                --primary-dark: var(--primary-dark) !important;
+                --primary-light: var(--primary-light) !important;
+            }
+
+            /* Forzar colores en dispositivos móviles */
+            body.dark .bg-background-dark .home-partial-view {
+                color: var(--text-light) !important;
+            }
+
+            /* Corregir otros problemas de visualización móvil */
+            .navbar, .footer {
+                background-color: var(--accent-color) !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="font-sans antialiased transition-colors duration-300">
@@ -168,8 +194,6 @@
     </div>
 
     <!-- Scripts al final del body -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         // Inicializar AOS
         AOS.init({

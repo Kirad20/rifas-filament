@@ -120,3 +120,30 @@ footer a:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(15, 55, 8, 0.1);
 }
+
+/* Aumentar especificidad para vistas parciales */
+.bg-background .rifa-card,
+.dark .bg-background-dark .rifa-card {
+    border: 1px solid rgba(161, 205, 47, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bg-background .rifa-card:hover,
+.dark .bg-background-dark .rifa-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(15, 55, 8, 0.1);
+}
+
+/* Estilos específicos para vistas parciales */
+.home-partial-view {
+    --text-color: var(--text-color);
+    --text-light: var(--text-light);
+    --primary-color: var(--primary-color);
+    --primary-dark: var(--primary-dark);
+    --primary-light: var(--primary-light);
+}
+
+.dark .home-partial-view {
+    --text-color: var(--text-light);
+    --text-light: var(--text-light);
+}
