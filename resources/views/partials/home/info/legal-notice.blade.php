@@ -2,11 +2,7 @@
 <section id="disclaimer" class="bg-white dark:bg-background-dark/30 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
     <div class="flex items-center mb-6">
         <div class="bg-primary-light/30 p-3 rounded-full mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <div class="text-2xl text-primary">ℹ️</div>
         </div>
         <h2 class="text-2xl font-bold text-accent dark:text-primary">Aviso Legal</h2>
     </div>

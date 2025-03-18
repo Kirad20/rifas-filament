@@ -61,7 +61,7 @@
                     <div class="flex items-center">
                         <a href="{{ route('home') }}" class="flex items-center text-2xl font-bold text-primary">
                             <i class="fas fa-ticket-alt mr-2 rotate-45"></i>
-                            <span class="tracking-wider">SorteosMX</span>
+                            <span class="tracking-wider">Concursos y Sorteos San Miguel</span>
                         </a>
                     </div>
 
@@ -121,7 +121,7 @@
             <div class="container mx-auto px-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                     <div data-aos="fade-up" data-aos-delay="100">
-                        <h3 class="text-2xl font-bold mb-6 text-primary">SorteosMX</h3>
+                        <h3 class="text-2xl font-bold mb-6 text-primary">Concursos y Sorteos San Miguel</h3>
                         <p class="text-text-light text-lg">
                             La mejor plataforma para participar en rifas y sorteos en México.
                         </p>
@@ -171,7 +171,7 @@
 
                 <div
                     class="border-t border-primary-dark/30 mt-12 pt-8 text-center text-text-light/80">
-                    <p class="text-lg">&copy; {{ date('Y') }} SorteosMX. Todos los derechos reservados.</p>
+                    <p class="text-lg">&copy; {{ date('Y') }} Concursos y Sorteos San Miguel. Todos los derechos reservados.</p>
                 </div>
             </div>
         </footer>

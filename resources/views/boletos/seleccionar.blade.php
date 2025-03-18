@@ -3,47 +3,47 @@
 @section('title', 'Seleccionar Boletos - ' . $rifa->nombre)
 
 @section('content')
-    <div class="bg-gray-100 py-12">
+    <div class="bg-background py-12">
         <div class="container mx-auto px-4">
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="p-8 bg-amber-500 text-white">
+            <div class="bg-white dark:bg-background-dark/30 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-8 bg-primary text-text-light">
                     <h1 class="text-3xl font-bold">Seleccionar Boletos - {{ $rifa->nombre }}</h1>
                     <p class="mt-2">Precio por boleto: ${{ number_format($rifa->precio_boleto, 2) }}</p>
                 </div>
 
-                <div class="p-6 border-b">
+                <div class="p-6 border-b dark:border-gray-700">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                            <h2 class="text-xl font-bold mb-2">Buscar boleto específico</h2>
+                            <h2 class="text-xl font-bold mb-2 text-accent dark:text-primary">Buscar boleto específico</h2>
                             <div class="flex gap-2">
                                 <input type="number" id="buscar-numero"
-                                    class="border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
+                                    class="border-gray-300 dark:border-gray-700 dark:bg-background-dark/50 dark:text-text-light rounded-md focus:ring-primary focus:border-primary"
                                     placeholder="Ej. 123">
                                 <button id="btn-buscar"
-                                    class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 transition">Buscar</button>
+                                    class="bg-primary text-text-light px-4 py-2 rounded-md hover:bg-primary-dark transition btn-primary">Buscar</button>
                             </div>
                         </div>
 
                         <!-- Agregar filtros rápidos para boletos -->
                         <div class="flex space-x-2">
                             <button type="button" id="btn-seleccionar-10"
-                                class="px-3 py-1 text-sm border border-amber-500 text-amber-600 rounded-md hover:bg-amber-50">
+                                class="px-3 py-1 text-sm border border-primary text-accent dark:text-primary rounded-md hover:bg-primary-light/20 dark:hover:bg-primary/20">
                                 Seleccionar 10
                             </button>
                             <button type="button" id="btn-seleccionar-20"
-                                class="px-3 py-1 text-sm border border-amber-500 text-amber-600 rounded-md hover:bg-amber-50">
+                                class="px-3 py-1 text-sm border border-primary text-accent dark:text-primary rounded-md hover:bg-primary-light/20 dark:hover:bg-primary/20">
                                 Seleccionar 20
                             </button>
                             <button type="button" id="btn-limpiar"
-                                class="px-3 py-1 text-sm border border-gray-300 text-gray-600 rounded-md hover:bg-gray-50">
+                                class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-700 text-text dark:text-text-light rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
                                 Limpiar
                             </button>
                         </div>
 
                         <div>
-                            <span class="font-medium">Boletos seleccionados: <span
+                            <span class="font-medium text-text dark:text-text-light">Boletos seleccionados: <span
                                     id="contador-seleccionados">0</span></span>
-                            <p class="text-sm text-gray-600">Total: $<span id="total-precio">0.00</span></p>
+                            <p class="text-sm text-text dark:text-text-light/80">Total: $<span id="total-precio">0.00</span></p>
                         </div>
                     </div>
                 </div>
@@ -54,9 +54,9 @@
 
                     <div class="p-6 max-h-96 overflow-y-auto">
                         <div class="flex justify-between mb-4">
-                            <h2 class="text-lg font-bold">Boletos disponibles</h2>
+                            <h2 class="text-lg font-bold text-accent dark:text-primary">Boletos disponibles</h2>
                             <div>
-                                <button type="button" id="btn-aleatorio" class="text-amber-500 hover:underline">Selección
+                                <button type="button" id="btn-aleatorio" class="text-primary hover:underline">Selección
                                     aleatoria</button>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                                     <input type="checkbox" name="boletos[]" value="{{ $boleto->id }}"
                                         id="boleto-{{ $boleto->id }}" class="hidden checkbox-boleto">
                                     <label for="boleto-{{ $boleto->id }}"
-                                        class="block border border-gray-300 rounded-md py-2 px-3 text-center cursor-pointer hover:bg-amber-50 transition">
+                                        class="block border border-gray-300 dark:border-gray-700 rounded-md py-2 px-3 text-center cursor-pointer hover:bg-primary-light/10 dark:hover:bg-primary/10 transition text-text dark:text-text-light">
                                         {{ $boleto->numero }}
                                     </label>
                                 </div>
@@ -75,11 +75,11 @@
                         </div>
                     </div>
 
-                    <div class="p-6 bg-gray-50 border-t">
+                    <div class="p-6 bg-background dark:bg-background-dark/50 border-t dark:border-gray-700">
                         <div class="flex justify-between items-center">
-                            <p class="text-gray-600">Los boletos seleccionados se reservarán por 15 minutos</p>
+                            <p class="text-text dark:text-text-light/80">Los boletos seleccionados se reservarán por 15 minutos</p>
                             <button type="submit"
-                                class="bg-amber-500 text-white px-6 py-3 rounded-md hover:bg-amber-600 transition font-medium"
+                                class="bg-primary text-text-light px-6 py-3 rounded-md hover:bg-primary-dark transition font-medium btn-primary"
                                 id="btn-agregar-carrito" disabled>
                                 Agregar al carrito
                             </button>
@@ -112,9 +112,9 @@
                 checkbox.addEventListener('change', function() {
                     const label = this.nextElementSibling;
                     if (this.checked) {
-                        label.classList.add('bg-amber-200', 'border-amber-500');
+                        label.classList.add('bg-primary', 'border-primary', 'text-text-light');
                     } else {
-                        label.classList.remove('bg-amber-200', 'border-amber-500');
+                        label.classList.remove('bg-primary', 'border-primary', 'text-text-light');
                     }
                     actualizarContadores();
                 });
@@ -152,8 +152,7 @@
                 if (disponibles.length > 0) {
                     const aleatorio = Math.floor(Math.random() * disponibles.length);
                     disponibles[aleatorio].checked = true;
-                    disponibles[aleatorio].nextElementSibling.classList.add('bg-amber-200',
-                        'border-amber-500');
+                    disponibles[aleatorio].nextElementSibling.classList.add('bg-primary', 'border-primary', 'text-text-light');
                     actualizarContadores();
                     disponibles[aleatorio].scrollIntoView({
                         behavior: 'smooth',
@@ -176,8 +175,7 @@
             document.getElementById('btn-limpiar').addEventListener('click', function() {
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = false;
-                    checkbox.nextElementSibling.classList.remove('bg-amber-200',
-                    'border-amber-500');
+                    checkbox.nextElementSibling.classList.remove('bg-primary', 'border-primary', 'text-text-light');
                 });
                 actualizarContadores();
             });
@@ -186,7 +184,7 @@
                 // Desmarcar todos primero
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = false;
-                    checkbox.nextElementSibling.classList.remove('bg-amber-200', 'border-amber-500');
+                    checkbox.nextElementSibling.classList.remove('bg-primary', 'border-primary', 'text-text-light');
                 });
 
                 const disponibles = Array.from(checkboxes);
@@ -204,8 +202,7 @@
                 // Marcar los boletos seleccionados
                 indices.forEach(indice => {
                     disponibles[indice].checked = true;
-                    disponibles[indice].nextElementSibling.classList.add('bg-amber-200',
-                    'border-amber-500');
+                    disponibles[indice].nextElementSibling.classList.add('bg-primary', 'border-primary', 'text-text-light');
                 });
 
                 actualizarContadores();
@@ -224,17 +221,15 @@
     <style>
         .destacado label {
             animation: highlight 2s ease-in-out;
-            border-color: #f59e0b;
-            background-color: #fef3c7;
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            opacity: 0.7;
         }
 
         @keyframes highlight {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
             }
-
             50% {
                 transform: scale(1.1);
             }

@@ -12,4 +12,9 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-});
+    build: {
+        manifest: true,
+        outDir: 'public/build', // <- Asegura que Vite genere los archivos en esta ruta
+    }
+},
+);

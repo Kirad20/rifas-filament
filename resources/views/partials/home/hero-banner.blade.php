@@ -1,16 +1,9 @@
 <!-- Hero Banner con overlay y diseño mejorado -->
 <div class="relative bg-gradient-to-r from-accent to-secondary text-white overflow-hidden">
-    <!-- Patrón de fondo para dar textura -->
-    <div class="absolute inset-0 opacity-10">
-        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-            <defs>
-                <pattern id="pattern" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M0 20 L40 20" stroke="currentColor" stroke-width="1"></path>
-                    <path d="M20 0 L20 40" stroke="currentColor" stroke-width="1"></path>
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#pattern)"></rect>
-        </svg>
+    <!-- Patrón de fondo para dar textura usando CSS en lugar de SVG -->
+    <div class="absolute inset-0 opacity-10"
+         style="background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+                background-size: 40px 40px;">
     </div>
 
     <div class="container mx-auto px-4 py-24 relative z-10">
@@ -18,7 +11,7 @@
             <span class="inline-block bg-white/20 px-4 py-1 rounded-full text-sm font-medium backdrop-blur-sm mb-6">La
                 mejor plataforma de sorteos</span>
             <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">¡Participa y Gana con <span
-                    class="text-primary">SorteosMX</span>!</h1>
+                    class="text-primary">Concursos y Sorteos San Miguel</span>!</h1>
             <p class="text-xl md:text-2xl mb-10 text-white/90">La plataforma de rifas en línea con premios increíbles,
                 resultados transparentes y la mejor experiencia para nuestros usuarios.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -54,10 +47,10 @@
         </div>
     </div>
 
-    <!-- Decoración curva inferior -->
-    <div class="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#f9fafb">
-            <path d="M0,0 C240,95 480,95 720,47.5 C960,0 1200,0 1440,47.5 L1440,100 L0,100 Z"></path>
-        </svg>
+    <!-- Decoración curva inferior usando CSS en lugar de SVG -->
+    <div class="absolute bottom-0 left-0 right-0 h-24 overflow-hidden"
+         style="background-color: #f9fafb;
+                border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+                transform: translateY(50%);">
     </div>
 </div>
