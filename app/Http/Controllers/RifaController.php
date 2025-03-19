@@ -43,7 +43,6 @@ class RifaController extends Controller
      */
     public function seleccionarBoletos($id)
     {
-        $limite_boletos = 10;
         // Obtener la rifa
         $rifa = Rifa::findOrFail($id);
 
@@ -53,13 +52,20 @@ class RifaController extends Controller
                 ->with('error', 'Esta rifa no está disponible para la compra de boletos.');
         }
 
-        $boletos = Boleto::where('rifa_id', $id)->get();
+        // Obtener todos los boletos de esta rifa
+        $boletos = $rifa->boletos()->get();
 
-        $disponibles = $boletos->where('estado', 'disponible');
+        // Si no hay boletos, crear registro ficticio para generar números
+        if ($boletos->isEmpty()) {
+            \Log::info("No se encontraron boletos para la rifa ID: {$id}. Se utilizará un valor predeterminado.");
 
-        $total = $disponibles->count();
+            // Asegurarse de que total_boletos esté definido
+            if (empty($rifa->total_boletos) || !is_numeric($rifa->total_boletos) || $rifa->total_boletos <= 0) {
+                $rifa->total_boletos = $rifa->boletos_totales ?? 100;
+            }
+        }
 
-        return view('rifas.partials.seleccion.index', compact('disponibles', 'rifa', 'total', 'boletos', 'limite_boletos'));
+        return view('rifas.seleccionar-boletos', compact('rifa', 'boletos'));
     }
 
     /**
@@ -121,7 +127,7 @@ class RifaController extends Controller
                 'rifa_id' => $rifa->id,
             ]);
 
-            $carritoItem->precio_unitario = $rifa->precio;
+            $carritoItem->precio_unitario = $rifa->precio_boleto;
             $carritoItem->save();
 
             // Agregar los boletos seleccionados al item del carrito
@@ -150,6 +156,51 @@ class RifaController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Error al procesar tu selección. Por favor, inténtalo de nuevo.');
         }
+    }
+
+    /**
+     * Procesa la compra de boletos seleccionados
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function procesarCompra(Request $request)
+    {
+        // Validar la solicitud
+        $validated = $request->validate([
+            'rifa_id' => 'required|exists:rifas,id',
+            'boletos' => 'required|string',
+        ]);
+
+        // Decodificar el JSON de boletos
+        $boletosSeleccionados = json_decode($validated['boletos']);
+
+        // Obtener la rifa
+        $rifa = Rifa::findOrFail($validated['rifa_id']);
+
+        // Verificar que los boletos están disponibles
+        $boletosVendidos = $rifa->boletos_vendidos_array ?? [];
+        $boletosNoDisponibles = array_intersect($boletosSeleccionados, $boletosVendidos);
+
+        if (count($boletosNoDisponibles) > 0) {
+            return redirect()->back()->with('error', 'Algunos boletos ya no están disponibles. Por favor, seleccione otros.');
+        }
+
+        // Calcular el total
+        $total = count($boletosSeleccionados) * $rifa->precio;
+
+        // Guardar los datos en la sesión para el proceso de pago
+        session([
+            'compra_boletos' => [
+                'rifa_id' => $rifa->id,
+                'boletos' => $boletosSeleccionados,
+                'total' => $total,
+                'timestamp' => now(),
+            ]
+        ]);
+
+        // Redireccionar a la página de pago
+        return redirect()->route('checkout.index');
     }
 
     /**

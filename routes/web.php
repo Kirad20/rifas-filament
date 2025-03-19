@@ -23,11 +23,17 @@ Route::get('/rifas/{id}/boletos-disponibles', [RifaController::class, 'boletosDi
 Route::post('/rifas/{id}/comprar', [RifaController::class, 'comprarBoletos'])->name('rifas.comprar');
 Route::get('/rifas/confirmar-compra/{venta}', [RifaController::class, 'confirmarCompra'])->name('rifas.confirmar-compra');
 
+// Ruta para procesar la compra de boletos
+Route::post('/rifas/procesar-compra', [RifaController::class, 'procesarCompra'])->name('rifas.procesar-compra');
+
 // Rutas de carrito
 Route::get('/carrito/{token}', [CartController::class, 'mostrar'])->name('carrito.mostrar');
 Route::get('/carrito/{token}/eliminar/{itemId}/{numeroBoleto}', [CartController::class, 'eliminarBoleto'])->name('carrito.eliminar-boleto');
 Route::get('/carrito/{token}/finalizar', [CartController::class, 'finalizarForm'])->name('carrito.finalizar.form');
 Route::post('/carrito/{token}/finalizar', [CartController::class, 'finalizar'])->name('carrito.finalizar');
+
+// Ruta para la página de checkout
+Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
 
 // Rutas de contacto
 Route::get('/contacto', [ContactoController::class, 'index'])->name('contacto');
