@@ -41,5 +41,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ... el resto del código JavaScript existente ...
+    // Contador animado para estadísticas
+    const estadisticaValores = document.querySelectorAll('.estadistica-valor');
+
+    const animarContadores = () => {
+        estadisticaValores.forEach(valor => {
+            const objetivo = parseInt(valor.getAttribute('data-valor'));
+            const duracion = 2000; // 2 segundos
+            let valorActual = 0;
+            const incremento = objetivo / (duracion / 16);
+
+            const contador = setInterval(() => {
+                valorActual += incremento;
+                if (valorActual >= objetivo) {
+                    valorActual = objetivo;
+                    clearInterval(contador);
+                }
+
+                // Si tiene un signo + o % al final
+                const signo = valor.getAttribute('data-signo') || '';
+                valor.textContent = Math.floor(valorActual) + signo;
+
+                if (valorActual >= objetivo) {
+                    clearInterval(contador);
+                }
+            }, 16);
+        });
+    };
+
+    // IntersectionObserver para activar la animación cuando sea visible
+    if ('IntersectionObserver' in window) {
+        const estadisticasSeccion = document.querySelector('.estadisticas');
+        if (estadisticasSeccion) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animarContadores();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            observer.observe(estadisticasSeccion);
+        }
+    } else {
+        // Fallback para navegadores que no soporten IntersectionObserver
+        animarContadores();
+    }
 });
