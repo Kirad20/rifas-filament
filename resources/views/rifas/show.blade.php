@@ -90,29 +90,6 @@
             @endif
         </div>
     </div>
-
-    @if($rifa->estado === 'activa')
-        <div id="seleccionar-boletos" class="my-5">
-            <h3 class="mb-4">Selecciona tus boletos</h3>
-
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                Disponibles: {{ $boletosDisponibles }} boletos
-            </div>
-
-            <div class="row gx-2 gy-2 mt-4">
-                <!-- Aquí iría la lógica para mostrar los boletos disponibles -->
-                <!-- Esto es un ejemplo visual, necesitarías implementar la lógica real -->
-                @for($i = 1; $i <= min(100, $rifa->total_boletos); $i++)
-                    <div class="col-1">
-                        <div class="boleto-item {{ random_int(1, 3) == 1 ? 'vendido' : '' }}">
-                            {{ $i }}
-                        </div>
-                    </div>
-                @endfor
-            </div>
-        </div>
-    @endif
 </div>
 
 <style>

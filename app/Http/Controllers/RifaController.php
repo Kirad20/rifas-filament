@@ -52,7 +52,7 @@ class RifaController extends Controller
                 ->with('error', 'Esta rifa no está disponible para la compra de boletos.');
         }
 
-        return view('rifas.seleccionar-boletos', compact('rifa'));
+        return view('rifas.partials.seleccion.index', compact('rifa'));
     }
 
     /**

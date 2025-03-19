@@ -16,6 +16,7 @@
         "filament/forms": "^3.0",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "laravel/framework": "^11.31",
+        "laravel/telescope": "^5.6",
         "laravel/tinker": "^2.9",
         "miguilim/filament-auto-panel": "^2.0",
         "tomatophp/filament-settings-hub": "^2.0"
