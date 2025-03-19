@@ -43,6 +43,7 @@ class RifaController extends Controller
      */
     public function seleccionarBoletos($id)
     {
+        $limite_boletos = 10;
         // Obtener la rifa
         $rifa = Rifa::findOrFail($id);
 
@@ -52,7 +53,13 @@ class RifaController extends Controller
                 ->with('error', 'Esta rifa no está disponible para la compra de boletos.');
         }
 
-        return view('rifas.partials.seleccion.index', compact('rifa'));
+        $boletos = Boleto::where('rifa_id', $id)->get();
+
+        $disponibles = $boletos->where('estado', 'disponible');
+
+        $total = $disponibles->count();
+
+        return view('rifas.partials.seleccion.index', compact('disponibles', 'rifa', 'total', 'boletos', 'limite_boletos'));
     }
 
     /**

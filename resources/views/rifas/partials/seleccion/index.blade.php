@@ -44,7 +44,7 @@
         <h2 class="text-2xl font-bold text-accent dark:text-primary mb-4">Selecciona tus Boletos</h2>
 
         <div class="mb-6">
-            <p class="text-text dark:text-text-light/80 mb-3">Haz clic en los boletos que deseas comprar. Puedes seleccionar hasta {{ $limite_boletos }} boletos por compra.</p>
+            <p class="text-text dark:text-text-light/80 mb-3">Haz clic en los boletos que deseas comprar.</p>
 
             <div class="flex flex-wrap items-center gap-3 mb-4">
                 <span class="inline-flex items-center">
