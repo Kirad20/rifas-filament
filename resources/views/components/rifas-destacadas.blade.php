@@ -6,7 +6,7 @@
             <div class="rifas-grid">
                 @foreach($rifas as $rifa)
                     <div class="rifa-card">
-                        <img src="{{ $rifa->getFirstMediaUrl('imagen') ?: asset('img/placeholder.jpg') }}" alt="{{ $rifa->nombre }}" class="rifa-img">
+                        <img src="{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}" alt="{{ $rifa->nombre }}" class="rifa-img">
                         <div class="rifa-info">
                             <h3 class="rifa-titulo">{{ $rifa->nombre }}</h3>
                             <div class="rifa-precio">${{ number_format($rifa->precio, 2) }} MXN por boleto</div>

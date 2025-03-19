@@ -14,8 +14,35 @@
 
     <div class="row">
         <div class="col-md-6">
-            <img src="{{ $rifa->getFirstMediaUrl('imagen') ?: asset('img/placeholder.jpg') }}"
-                alt="{{ $rifa->nombre }}" class="img-fluid rounded">
+            <!-- Carousel de imágenes -->
+            <div class="rifa-carousel">
+                <div class="carousel-main mb-3">
+                    <img src="{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}"
+                        alt="{{ $rifa->nombre }}" class="img-fluid rounded active-img" id="featured-img">
+                </div>
+
+                @if($rifa->getMedia('fotos')->count() > 0)
+                <div class="carousel-thumbs">
+                    <div class="thumb-container">
+                        <!-- Imagen de portada también como miniatura -->
+                        <div class="thumb-item active">
+                            <img src="{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}"
+                                alt="{{ $rifa->nombre }}" class="img-thumbnail"
+                                onclick="changeImage('{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}', this)">
+                        </div>
+
+                        <!-- Imágenes adicionales de la colección 'fotos' -->
+                        @foreach($rifa->getMedia('fotos') as $media)
+                        <div class="thumb-item">
+                            <img src="{{ $media->getUrl() }}"
+                                alt="{{ $rifa->nombre }}" class="img-thumbnail"
+                                onclick="changeImage('{{ $media->getUrl() }}', this)">
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+            </div>
         </div>
         <div class="col-md-6">
             <h1>{{ $rifa->nombre }}</h1>
@@ -51,7 +78,7 @@
             </div>
 
             @if($rifa->estado === 'activa')
-                <a href="#seleccionar-boletos" class="btn btn-primario btn-lg">Comprar boletos</a>
+                <a href="{{ route('rifas.seleccionar-boletos', $rifa->id) }}" class="btn btn-primario btn-lg">Comprar boletos</a>
             @elseif($rifa->estado === 'finalizada')
                 <div class="alert alert-secondary">
                     Esta rifa ya ha finalizado. Consulta los resultados en nuestra sección de ganadores.
@@ -122,5 +149,64 @@
         right: 0;
         border-top: 1px solid #9ca3af;
     }
+
+    .carousel-main {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .carousel-main img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+
+    .carousel-thumbs {
+        width: 100%;
+        overflow-x: auto;
+        padding: 10px 0;
+    }
+
+    .thumb-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    .thumb-item {
+        flex: 0 0 auto;
+        width: 80px;
+        height: 80px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.3s;
+    }
+
+    .thumb-item.active {
+        opacity: 1;
+        border: 2px solid var(--color-primary);
+    }
+
+    .thumb-item:hover {
+        opacity: 1;
+    }
+
+    .thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 </style>
+
+<script>
+    function changeImage(src, element) {
+        // Cambiar la imagen principal
+        document.getElementById('featured-img').src = src;
+
+        // Actualizar la clase activa en las miniaturas
+        const thumbs = document.querySelectorAll('.thumb-item');
+        thumbs.forEach(thumb => thumb.classList.remove('active'));
+        element.parentElement.classList.add('active');
+    }
+</script>
 @endsection

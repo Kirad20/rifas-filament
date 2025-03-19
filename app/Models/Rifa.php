@@ -46,6 +46,9 @@ class Rifa extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('portada')
+            ->singleFile();
+
         $this->addMediaCollection('fotos');
     }
 
