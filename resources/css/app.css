@@ -1,25 +1,2 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
-
-/* Importar theme.css antes de utilities para que las utilidades puedan sobreescribir tema */
-@import './theme.css';
-
-@import 'tailwindcss/utilities';
-
-/* Importaciones de vendor - asegurar que no haya duplicación */
-@import './vendor/fontawesome.css';
-@import './vendor/aos.css';
-@import './vendor/swiper.css';
-
-/* Estilos específicos para móviles */
-@media (max-width: 767px) {
-    .home-partial-view {
-        --text-color: var(--text-color) !important;
-        --text-light: var(--text-light) !important;
-        --primary-color: var(--primary-color) !important;
-        --primary-dark: var(--primary-dark) !important;
-        --primary-light: var(--primary-light) !important;
-    }
-
-    /* Otros ajustes para móviles */
-}
