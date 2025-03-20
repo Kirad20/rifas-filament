@@ -1,9 +1,15 @@
 /**
  * Módulo de selección de boletos para rifas
+ * @author Desarrollador
+ * @version 2.0
  */
 class BoletosSelector {
+    /**
+     * Constructor de la clase
+     * @param {Object} options - Configuración del selector
+     */
     constructor(options) {
-        // Configuración y datos
+        // Propiedades de configuración
         this.precio = options.precio;
         this.totalBoletos = options.totalBoletos;
         this.boletos = options.boletos;
@@ -12,36 +18,31 @@ class BoletosSelector {
         this.csrfToken = options.csrfToken;
         this.formAction = options.formAction;
 
-        // Estado
+        // Estado del componente
         this.boletosSeleccionados = [];
         this.paginaActual = 1;
         this.mostrarSoloDisponibles = false;
+        this.isLoading = false;
 
-        // Arrays de boletos clasificados
+        // Clasificación de boletos
         this.boletosNoDisponibles = [];
         this.numerosDisponibles = [];
-
-        // Inicializar
-        this.init();
     }
 
+    /**
+     * Inicializa el selector de boletos
+     */
     init() {
-        // Clasificar boletos
         this.clasificarBoletos();
-
-        // Configurar elementos DOM
         this.configurarDOM();
-
-        // Configurar event listeners
         this.configurarEventListeners();
-
-        // Mostrar información de depuración
-        this.mostrarDebugInfo();
-
-        // Cargar boletos iniciales
         this.cargarTodosLosBoletos();
+        this.actualizarContadorDisponibles();
     }
 
+    /**
+     * Clasifica boletos entre disponibles y no disponibles
+     */
     clasificarBoletos() {
         Object.values(this.boletos).forEach(boleto => {
             if (boleto.estado !== 'disponible') {
@@ -52,6 +53,9 @@ class BoletosSelector {
         });
     }
 
+    /**
+     * Configura las referencias a elementos del DOM
+     */
     configurarDOM() {
         // Elementos principales
         this.gridBoletos = document.getElementById('boletosGrid');
@@ -62,6 +66,7 @@ class BoletosSelector {
         this.mensajeVacio = document.getElementById('mensajeVacio');
         this.btnBuscar = document.getElementById('btnBuscar');
         this.inputBuscar = document.getElementById('buscarBoleto');
+        this.contadorDisponibles = document.getElementById('contadorDisponibles');
 
         // Botones de filtro
         this.btnMostrarTodos = document.getElementById('mostrarTodos');
@@ -72,162 +77,161 @@ class BoletosSelector {
         this.btnPaginaAnterior = document.getElementById('paginaAnterior');
         this.btnPaginaSiguiente = document.getElementById('paginaSiguiente');
         this.paginadorActual = document.getElementById('paginaActual');
+        this.paginadorActualMobile = document.getElementById('paginaActualMobile');
 
-        // Selección avanzada - actualizar para usar los selectores de los modales
-        this.btnSeleccionarRango = document.getElementById('btnSeleccionarRango');
-        this.rangoInicio = document.getElementById('rangoInicio');
-        this.rangoFin = document.getElementById('rangoFin');
-        this.btnSeleccionar10 = document.getElementById('btnSeleccionar10');
-        this.btnSeleccionar25 = document.getElementById('btnSeleccionar25');
-        this.btnSeleccionar50 = document.getElementById('btnSeleccionar50');
-        this.btnSeleccionar100 = document.getElementById('btnSeleccionar100');
-        this.btnSeleccionarAleatorio = document.getElementById('btnSeleccionarAleatorio');
-        this.cantidadAleatoria = document.getElementById('cantidadAleatoria');
-        this.btnSeleccionarTerminacion = document.getElementById('btnSeleccionarTerminacion');
-        this.terminacion = document.getElementById('terminacion');
-        this.btnLimpiarSeleccion = document.getElementById('btnLimpiarSeleccion');
-
-        // Configuración inicial
+        // Configuración inicial de filtros
         this.btnMostrarTodos.classList.add('active');
     }
 
+    /**
+     * Configura los eventos básicos del selector
+     */
     configurarEventListeners() {
-        // Búsqueda
+        // Búsqueda de boletos
         this.btnBuscar.addEventListener('click', () => this.buscarBoleto());
         this.inputBuscar.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.buscarBoleto();
         });
 
-        // Filtros
-        this.btnMostrarTodos.addEventListener('click', () => {
-            this.paginaActual = 1;
-            this.mostrarSoloDisponibles = false;
-            this.btnMostrarTodos.classList.add('active');
-            this.btnMostrarDisponibles.classList.remove('active');
-            this.cargarBoletos();
-        });
-
-        this.btnMostrarDisponibles.addEventListener('click', () => {
-            this.paginaActual = 1;
-            this.mostrarSoloDisponibles = true;
-            this.btnMostrarDisponibles.classList.add('active');
-            this.btnMostrarTodos.classList.remove('active');
-            this.cargarBoletos();
-        });
-
-        this.btnMostrarSeleccionados.addEventListener('click', () => this.mostrarSeleccionados());
+        // Filtros de visualización
+        this.btnMostrarTodos.addEventListener('click', () => this.filtrarBoletos('todos'));
+        this.btnMostrarDisponibles.addEventListener('click', () => this.filtrarBoletos('disponibles'));
+        this.btnMostrarSeleccionados.addEventListener('click', () => this.filtrarBoletos('seleccionados'));
 
         // Paginación
-        this.btnPaginaAnterior.addEventListener('click', () => {
-            if (this.paginaActual > 1) {
-                this.paginaActual--;
-                this.cargarBoletos();
-            }
-        });
-
-        this.btnPaginaSiguiente.addEventListener('click', () => {
-            const totalPaginas = Math.ceil(this.totalBoletos / this.boletosPorPagina);
-            if (this.paginaActual < totalPaginas) {
-                this.paginaActual++;
-                this.cargarBoletos();
-            }
-        });
-
-        // Selección avanzada
-        this.btnSeleccionarRango.addEventListener('click', () => {
-            const inicio = parseInt(this.rangoInicio.value);
-            const fin = parseInt(this.rangoFin.value);
-
-            if (isNaN(inicio) || isNaN(fin) || inicio < 1 ||
-                fin > this.totalBoletos || inicio > fin) {
-                alert(`Por favor ingrese un rango válido entre 1 y ${this.totalBoletos}`);
-                return;
-            }
-
-            this.seleccionarPorRango(inicio, fin);
-        });
-
-        // Botones de selección rápida
-        this.btnSeleccionar10.addEventListener('click', () => this.seleccionarRapida(10));
-        this.btnSeleccionar25.addEventListener('click', () => this.seleccionarRapida(25));
-        this.btnSeleccionar50.addEventListener('click', () => this.seleccionarRapida(50));
-        this.btnSeleccionar100.addEventListener('click', () => this.seleccionarRapida(100));
-
-        // Selección aleatoria
-        this.btnSeleccionarAleatorio.addEventListener('click', () => {
-            const cantidad = parseInt(this.cantidadAleatoria.value);
-
-            if (isNaN(cantidad) || cantidad < 1 || cantidad > 100) {
-                alert('Por favor ingrese una cantidad válida entre 1 y 100');
-                return;
-            }
-
-            this.seleccionarAleatorio(cantidad);
-        });
-
-        // Selección por terminación
-        this.btnSeleccionarTerminacion.addEventListener('click', () => {
-            const terminacion = parseInt(this.terminacion.value);
-
-            if (isNaN(terminacion) || terminacion < 0 || terminacion > 9) {
-                alert('Por favor ingrese un dígito válido (0-9)');
-                return;
-            }
-
-            this.seleccionarPorTerminacion(terminacion);
-        });
-
-        // Limpiar selección
-        this.btnLimpiarSeleccion.addEventListener('click', () => this.limpiarSeleccion());
+        this.btnPaginaAnterior.addEventListener('click', () => this.cambiarPagina('anterior'));
+        this.btnPaginaSiguiente.addEventListener('click', () => this.cambiarPagina('siguiente'));
 
         // Proceder al pago
         this.btnProcederPago.addEventListener('click', () => this.procederAlPago());
     }
 
-    mostrarDebugInfo() {
-        console.log("Información de boletos:");
-        console.log("- Total boletos de la rifa: ", this.totalBoletos);
-        console.log("- Boletos no disponibles: ", this.boletosNoDisponibles.length);
-        console.log("- Boletos disponibles: ", this.numerosDisponibles.length);
+    /**
+     * Cambia a la página anterior o siguiente
+     * @param {string} direccion - 'anterior' o 'siguiente'
+     */
+    cambiarPagina(direccion) {
+        const paginaInicial = this.paginaActual;
+        const totalPaginas = Math.ceil(this.totalBoletos / this.boletosPorPagina);
 
-        // Agregar mensaje de depuración visible
-        const debugInfo = document.createElement('div');
-        debugInfo.className = 'alert alert-info mb-3 small';
-        debugInfo.innerHTML = `<strong>Información de boletos:</strong><br>
-            Total boletos de la rifa: ${this.totalBoletos}<br>
-            Boletos no disponibles: ${this.boletosNoDisponibles.length}<br>
-            Boletos disponibles: ${this.numerosDisponibles.length}`;
+        if (direccion === 'anterior' && this.paginaActual > 1) {
+            this.paginaActual--;
+        } else if (direccion === 'siguiente' && this.paginaActual < totalPaginas) {
+            this.paginaActual++;
+        }
 
-        this.gridBoletos.parentNode.insertBefore(debugInfo, this.gridBoletos);
+        // Solo recargar si realmente cambió la página
+        if (paginaInicial !== this.paginaActual) {
+            this.setLoadingState(true);
+            setTimeout(() => {
+                this.cargarBoletos();
+                this.setLoadingState(false);
+            }, 300);
+        }
     }
 
-    cargarTodosLosBoletos() {
-        console.log("Forzando carga de todos los boletos...");
-        this.gridBoletos.innerHTML = '<div class="alert alert-secondary w-100 text-center">Cargando boletos...</div>';
+    /**
+     * Filtra los boletos según el modo seleccionado
+     * @param {string} modo - 'todos', 'disponibles' o 'seleccionados'
+     */
+    filtrarBoletos(modo) {
+        this.setLoadingState(true);
 
         setTimeout(() => {
-            this.cargarBoletos();
-        }, 100);
+            if (modo === 'todos') {
+                this.paginaActual = 1;
+                this.mostrarSoloDisponibles = false;
+                this.cargarBoletos();
+            } else if (modo === 'disponibles') {
+                this.paginaActual = 1;
+                this.mostrarSoloDisponibles = true;
+                this.cargarBoletos();
+            } else if (modo === 'seleccionados') {
+                this.mostrarSeleccionados();
+            }
+
+            this.actualizarBotonesActivos(modo);
+            this.setLoadingState(false);
+        }, 300);
     }
 
+    /**
+     * Actualiza las clases active en los botones de filtro
+     * @param {string} modo - El modo activo
+     */
+    actualizarBotonesActivos(modo) {
+        this.btnMostrarTodos.classList.remove('active');
+        this.btnMostrarDisponibles.classList.remove('active');
+        this.btnMostrarSeleccionados.classList.remove('active');
+
+        if (modo === 'todos') {
+            this.btnMostrarTodos.classList.add('active');
+        } else if (modo === 'disponibles') {
+            this.btnMostrarDisponibles.classList.add('active');
+        } else if (modo === 'seleccionados') {
+            this.btnMostrarSeleccionados.classList.add('active');
+        }
+    }
+
+    /**
+     * Actualiza el contador de boletos disponibles
+     */
+    actualizarContadorDisponibles() {
+        if (this.contadorDisponibles) {
+            this.contadorDisponibles.textContent = this.numerosDisponibles.length;
+        }
+    }
+
+    /**
+     * Controla el estado de carga
+     * @param {boolean} loading - Si está cargando
+     */
+    setLoadingState(loading) {
+        this.isLoading = loading;
+        const loaderSelector = '.grid-loading';
+        const loader = document.querySelector(loaderSelector);
+
+        if (!loader && loading) {
+            const loaderDiv = document.createElement('div');
+            loaderDiv.className = 'grid-loading';
+            loaderDiv.innerHTML = '<div class="spinner"></div><p>Cargando boletos...</p>';
+            this.gridBoletos.parentNode.appendChild(loaderDiv);
+        } else if (loader && !loading) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.parentNode && loader.parentNode.removeChild(loader);
+            }, 300);
+        }
+    }
+
+    /**
+     * Carga los boletos iniciales
+     */
+    cargarTodosLosBoletos() {
+        this.setLoadingState(true);
+        setTimeout(() => {
+            this.cargarBoletos();
+            this.setLoadingState(false);
+        }, 300);
+    }
+
+    /**
+     * Carga los boletos en el grid según la paginación
+     */
     cargarBoletos() {
-        console.log("Iniciando carga de boletos...");
         this.gridBoletos.innerHTML = '';
-        this.paginadorActual.textContent = `Página ${this.paginaActual}`;
+        this.actualizarPaginadores();
 
         const inicio = (this.paginaActual - 1) * this.boletosPorPagina + 1;
         const fin = Math.min(this.paginaActual * this.boletosPorPagina, this.totalBoletos);
 
-        console.log(`Cargando boletos desde ${inicio} hasta ${fin}`);
-
         if (this.totalBoletos <= 0) {
-            this.gridBoletos.innerHTML = '<div class="alert alert-warning w-100 text-center">No hay boletos definidos para esta rifa</div>';
+            this.mostrarMensaje('No hay boletos definidos para esta rifa', 'warning');
             return;
         }
 
         let contadorBoletos = 0;
         let contadorDisponibles = 0;
-        let contadorNoDisponibles = 0;
         const fragment = document.createDocumentFragment();
 
         for (let i = inicio; i <= fin; i++) {
@@ -239,45 +243,53 @@ class BoletosSelector {
             }
 
             contadorBoletos++;
-            if (estaDisponible) {
-                contadorDisponibles++;
-            } else {
-                contadorNoDisponibles++;
-            }
+            if (estaDisponible) contadorDisponibles++;
 
             const estaSeleccionado = this.boletosSeleccionados.includes(i);
-            const boletoDom = document.createElement('div');
-            boletoDom.className = `boleto-item ${estaDisponible ? 'disponible' : 'vendido'} ${estaSeleccionado ? 'seleccionado' : ''}`;
-            boletoDom.textContent = i;
-            boletoDom.dataset.numero = i;
-
-            if (estaDisponible) {
-                boletoDom.addEventListener('click', () => {
-                    this.toggleSeleccionBoleto(i);
-                });
-            }
-
+            const boletoDom = this.crearElementoBoleto(i, estaDisponible, estaSeleccionado);
             fragment.appendChild(boletoDom);
         }
 
-        // Agregar todos los boletos al grid de una vez
         this.gridBoletos.appendChild(fragment);
 
-        console.log(`Se generaron ${contadorBoletos} boletos (${contadorDisponibles} disponibles, ${contadorNoDisponibles} no disponibles)`);
-
-        // Verificar si se generaron boletos
         if (this.gridBoletos.children.length === 0) {
-            let mensaje = 'No se encontraron boletos en este rango';
-            if (this.mostrarSoloDisponibles) {
-                mensaje = 'No hay boletos disponibles en este rango';
-            }
-            this.gridBoletos.innerHTML = `<div class="alert alert-info w-100 text-center">${mensaje}</div>`;
+            const mensaje = this.mostrarSoloDisponibles ?
+                'No hay boletos disponibles en este rango' :
+                'No se encontraron boletos en este rango';
+            this.mostrarMensaje(mensaje, 'info');
         }
 
-        // Actualizar contador total/disponibles
-        const infoContador = document.createElement('div');
-        infoContador.className = 'mt-3 text-end';
-        infoContador.innerHTML = `<small>Mostrando ${contadorBoletos} boletos. Total disponibles: ${this.numerosDisponibles.length}/${this.totalBoletos}</small>`;
+        this.actualizarEstadoPaginacion();
+        this.actualizarContadorGrid(contadorBoletos);
+    }
+
+    /**
+     * Actualiza todos los paginadores
+     */
+    actualizarPaginadores() {
+        const textoPagina = `Página ${this.paginaActual}`;
+        this.paginadorActual.textContent = textoPagina;
+
+        if (this.paginadorActualMobile) {
+            this.paginadorActualMobile.textContent = textoPagina;
+        }
+    }
+
+    /**
+     * Actualiza el estado habilitado/deshabilitado de los botones de paginación
+     */
+    actualizarEstadoPaginacion() {
+        const totalPaginas = Math.ceil(this.totalBoletos / this.boletosPorPagina);
+        this.btnPaginaAnterior.disabled = this.paginaActual <= 1;
+        this.btnPaginaSiguiente.disabled = this.paginaActual >= totalPaginas;
+    }
+
+    /**
+     * Actualiza el contador de boletos mostrados
+     * @param {number} contadorBoletos - Cantidad de boletos mostrados
+     */
+    actualizarContadorGrid(contadorBoletos) {
+        const infoHTML = `<small>Mostrando ${contadorBoletos} boletos. Total disponibles: ${this.numerosDisponibles.length}/${this.totalBoletos}</small>`;
 
         // Eliminar contador anterior si existe
         const contadorAnterior = this.gridBoletos.parentNode.querySelector('.mt-3.text-end');
@@ -285,9 +297,80 @@ class BoletosSelector {
             contadorAnterior.remove();
         }
 
+        // Crear nuevo contador
+        const infoContador = document.createElement('div');
+        infoContador.className = 'mt-3 text-end';
+        infoContador.innerHTML = infoHTML;
         this.gridBoletos.parentNode.appendChild(infoContador);
     }
 
+    /**
+     * Crea un elemento DOM para un boleto
+     * @param {number} numero - Número de boleto
+     * @param {boolean} estaDisponible - Si está disponible
+     * @param {boolean} estaSeleccionado - Si está seleccionado
+     * @returns {HTMLElement}
+     */
+    crearElementoBoleto(numero, estaDisponible, estaSeleccionado) {
+        const boletoDom = document.createElement('div');
+        boletoDom.className = `boleto-item ${estaDisponible ? 'disponible' : 'vendido'} ${estaSeleccionado ? 'seleccionado' : ''}`;
+        boletoDom.textContent = numero;
+        boletoDom.dataset.numero = numero;
+
+        if (estaDisponible) {
+            boletoDom.addEventListener('click', () => this.toggleSeleccionBoleto(numero));
+        }
+
+        return boletoDom;
+    }
+
+    /**
+     * Muestra un mensaje en el grid de boletos
+     * @param {string} texto - Texto del mensaje
+     * @param {string} tipo - Tipo de alerta (info, warning, etc)
+     */
+    mostrarMensaje(texto, tipo = 'info') {
+        this.gridBoletos.innerHTML = `<div class="alert alert-${tipo} w-100 text-center">${texto}</div>`;
+    }
+
+    /**
+     * Muestra los boletos seleccionados
+     */
+    mostrarSeleccionados() {
+        if (this.boletosSeleccionados.length === 0) {
+            alert('No has seleccionado ningún boleto aún');
+            return;
+        }
+
+        this.gridBoletos.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        this.boletosSeleccionados.forEach(numero => {
+            const boletoDom = document.createElement('div');
+            boletoDom.className = 'boleto-item disponible seleccionado';
+            boletoDom.textContent = numero;
+            boletoDom.dataset.numero = numero;
+            boletoDom.addEventListener('click', () => this.toggleSeleccionBoleto(numero));
+            fragment.appendChild(boletoDom);
+        });
+
+        this.gridBoletos.appendChild(fragment);
+
+        // Actualizar indicadores de paginación
+        this.paginadorActual.textContent = 'Seleccionados';
+        if (this.paginadorActualMobile) {
+            this.paginadorActualMobile.textContent = 'Seleccionados';
+        }
+
+        // Desactivar botones de paginación
+        this.btnPaginaAnterior.disabled = true;
+        this.btnPaginaSiguiente.disabled = true;
+    }
+
+    /**
+     * Alterna la selección de un boleto
+     * @param {number} numero - Número de boleto
+     */
     toggleSeleccionBoleto(numero) {
         const index = this.boletosSeleccionados.indexOf(numero);
         const boletoDom = document.querySelector(`.boleto-item[data-numero="${numero}"]`);
@@ -295,16 +378,54 @@ class BoletosSelector {
         if (index === -1) {
             // Agregar selección
             this.boletosSeleccionados.push(numero);
-            if (boletoDom) boletoDom.classList.add('seleccionado');
+            if (boletoDom) {
+                boletoDom.classList.add('seleccionado');
+                this.animarElemento(boletoDom, 'seleccionar');
+            }
         } else {
             // Quitar selección
             this.boletosSeleccionados.splice(index, 1);
-            if (boletoDom) boletoDom.classList.remove('seleccionado');
+            if (boletoDom) {
+                this.animarElemento(boletoDom, 'deseleccionar', () => {
+                    boletoDom.classList.remove('seleccionado');
+                });
+            }
         }
 
         this.actualizarSubtotal();
     }
 
+    /**
+     * Anima un elemento con efectos CSS
+     * @param {HTMLElement} elemento - Elemento a animar
+     * @param {string} tipo - Tipo de animación
+     * @param {Function} callback - Función a ejecutar al terminar
+     */
+    animarElemento(elemento, tipo, callback) {
+        if (tipo === 'seleccionar') {
+            elemento.animate([
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.2)' },
+                { transform: 'scale(1.05)' }
+            ], {
+                duration: 300,
+                easing: 'ease-out'
+            });
+        } else if (tipo === 'deseleccionar') {
+            elemento.animate([
+                { transform: 'scale(1.05)' },
+                { transform: 'scale(0.9)' },
+                { transform: 'scale(1)' }
+            ], {
+                duration: 300,
+                easing: 'ease-out'
+            }).onfinish = callback;
+        }
+    }
+
+    /**
+     * Actualiza el subtotal y la lista de boletos seleccionados
+     */
     actualizarSubtotal() {
         // Actualizar la lista de boletos seleccionados
         this.listaBoletos.innerHTML = '';
@@ -318,39 +439,40 @@ class BoletosSelector {
 
             // Ordenar los boletos numéricamente
             this.boletosSeleccionados.sort((a, b) => a - b);
-
-            this.boletosSeleccionados.forEach(numero => {
-                const item = document.createElement('li');
-                item.className = 'list-group-item d-flex justify-content-between align-items-center';
-
-                const numSpan = document.createElement('span');
-                numSpan.textContent = `Boleto #${numero}`;
-
-                const btnEliminar = document.createElement('button');
-                btnEliminar.className = 'btn btn-sm text-danger';
-                btnEliminar.innerHTML = '<i class="fas fa-times"></i>';
-                btnEliminar.addEventListener('click', () => {
-                    this.toggleSeleccionBoleto(numero);
-                });
-
-                item.appendChild(numSpan);
-                item.appendChild(btnEliminar);
-                this.listaBoletos.appendChild(item);
-            });
+            this.boletosSeleccionados.forEach(numero => this.agregarBoletoALista(numero));
         }
 
         // Actualizar cantidad y subtotal
-        this.cantidadBoletos.textContent = this.boletosSeleccionados.length;
-        const subtotal = this.boletosSeleccionados.length * this.precio;
-        this.subtotalPrecio.textContent = `$${subtotal.toFixed(2)} MXN`;
+        const cantidadBoletos = this.boletosSeleccionados.length;
+        const subtotal = cantidadBoletos * this.precio;
 
-        // Actualizar el contador de boletos en el encabezado
-        const counterElement = document.querySelector('.selection-counter');
-        if (counterElement) {
-            counterElement.textContent = this.boletosSeleccionados.length;
-        }
+        this.cantidadBoletos.textContent = cantidadBoletos;
+        this.subtotalPrecio.textContent = `$${subtotal.toFixed(2)} MXN`;
     }
 
+    /**
+     * Agrega un boleto a la lista de seleccionados
+     * @param {number} numero - Número del boleto
+     */
+    agregarBoletoALista(numero) {
+        const item = document.createElement('li');
+
+        const numSpan = document.createElement('span');
+        numSpan.textContent = `Boleto #${numero}`;
+
+        const btnEliminar = document.createElement('button');
+        btnEliminar.className = 'btn btn-sm text-danger';
+        btnEliminar.innerHTML = '<i class="fas fa-times"></i>';
+        btnEliminar.addEventListener('click', () => this.toggleSeleccionBoleto(numero));
+
+        item.appendChild(numSpan);
+        item.appendChild(btnEliminar);
+        this.listaBoletos.appendChild(item);
+    }
+
+    /**
+     * Busca y resalta un boleto específico
+     */
     buscarBoleto() {
         const numeroBuscado = parseInt(this.inputBuscar.value);
 
@@ -365,88 +487,68 @@ class BoletosSelector {
                 if (boletoBuscado) {
                     boletoBuscado.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     boletoBuscado.classList.add('highlight');
-                    setTimeout(() => {
-                        boletoBuscado.classList.remove('highlight');
-                    }, 2000);
+                    setTimeout(() => boletoBuscado.classList.remove('highlight'), 2000);
                 }
             }, 100);
         } else {
-            alert('Por favor ingresa un número de boleto válido entre 1 y ' + this.totalBoletos);
+            alert(`Por favor ingresa un número de boleto válido entre 1 y ${this.totalBoletos}`);
         }
     }
 
-    mostrarSeleccionados() {
-        if (this.boletosSeleccionados.length === 0) {
-            alert('No has seleccionado ningún boleto aún');
+    /**
+     * Procede al pago con los boletos seleccionados
+     */
+    procederAlPago() {
+        if (this.boletosSeleccionados.length === 0) return;
+
+        // Verificar que todos los boletos seleccionados estén disponibles
+        const boletosNoValidos = this.boletosSeleccionados.filter(numero => {
+            const boleto = this.boletos[numero] || { estado: 'disponible' };
+            return boleto.estado !== 'disponible';
+        });
+
+        if (boletosNoValidos.length > 0) {
+            alert(`Los siguientes boletos ya no están disponibles: ${boletosNoValidos.join(', ')}`);
             return;
         }
 
-        this.gridBoletos.innerHTML = '';
+        // Enviar formulario
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = this.formAction;
 
-        this.boletosSeleccionados.forEach(numero => {
-            const boletoDom = document.createElement('div');
-            boletoDom.className = 'boleto-item disponible seleccionado';
-            boletoDom.textContent = numero;
-            boletoDom.dataset.numero = numero;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = this.csrfToken;
 
-            boletoDom.addEventListener('click', () => {
-                this.toggleSeleccionBoleto(numero);
-            });
+        const rifaInput = document.createElement('input');
+        rifaInput.type = 'hidden';
+        rifaInput.name = 'rifa_id';
+        rifaInput.value = this.rifaId;
 
-            this.gridBoletos.appendChild(boletoDom);
-        });
+        const boletosInput = document.createElement('input');
+        boletosInput.type = 'hidden';
+        boletosInput.name = 'boletos';
+        boletosInput.value = JSON.stringify(this.boletosSeleccionados);
 
-        // Actualizar estado de los botones de filtro
-        this.btnMostrarTodos.classList.remove('active');
-        this.btnMostrarDisponibles.classList.remove('active');
-        this.btnMostrarSeleccionados.classList.add('active');
+        form.appendChild(csrfInput);
+        form.appendChild(rifaInput);
+        form.appendChild(boletosInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 
-    procederAlPago() {
-        if (this.boletosSeleccionados.length > 0) {
-            // Verificar que todos los boletos seleccionados estén disponibles
-            const boletosNoValidos = this.boletosSeleccionados.filter(numero => {
-                const boleto = this.boletos[numero] || { estado: 'disponible' };
-                return boleto.estado !== 'disponible';
-            });
+    // ===== Métodos para selección avanzada =====
 
-            if (boletosNoValidos.length > 0) {
-                alert(`Los siguientes boletos ya no están disponibles: ${boletosNoValidos.join(', ')}`);
-                return;
-            }
-
-            // Enviar formulario
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = this.formAction;
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = this.csrfToken;
-
-            const rifaInput = document.createElement('input');
-            rifaInput.type = 'hidden';
-            rifaInput.name = 'rifa_id';
-            rifaInput.value = this.rifaId;
-
-            const boletosInput = document.createElement('input');
-            boletosInput.type = 'hidden';
-            boletosInput.name = 'boletos';
-            boletosInput.value = JSON.stringify(this.boletosSeleccionados);
-
-            form.appendChild(csrfToken);
-            form.appendChild(rifaInput);
-            form.appendChild(boletosInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    // Funciones de selección avanzada que AGREGAN a la selección existente
+    /**
+     * Selecciona boletos por rango
+     * @param {number} inicio - Número inicial
+     * @param {number} fin - Número final
+     */
     seleccionarPorRango(inicio, fin) {
         let boletosAgregados = 0;
+
         for (let i = inicio; i <= fin; i++) {
             const boleto = this.boletos[i] || { numero: i, estado: 'disponible' };
             if (boleto.estado === 'disponible' && !this.boletosSeleccionados.includes(i)) {
@@ -455,24 +557,29 @@ class BoletosSelector {
             }
         }
 
-        // Recargar los boletos para mostrar la selección
-        this.cargarBoletos();
-        this.actualizarSubtotal();
-
-        alert(`Se han agregado ${boletosAgregados} boletos disponibles a tu selección.`);
+        if (boletosAgregados > 0) {
+            this.cargarBoletos();
+            this.actualizarSubtotal();
+            alert(`Se han agregado ${boletosAgregados} boletos disponibles a tu selección.`);
+        } else {
+            alert('No se encontraron boletos disponibles en el rango especificado.');
+        }
     }
 
+    /**
+     * Selecciona una cantidad específica de boletos disponibles
+     * @param {number} cantidad - Cantidad de boletos a seleccionar
+     */
     seleccionarRapida(cantidad) {
-        // Generar lista de boletos disponibles
-        let disponibles = [];
-        for (let i = 1; i <= this.totalBoletos; i++) {
-            const boleto = this.boletos[i] || { numero: i, estado: 'disponible' };
-            if (boleto.estado === 'disponible' && !this.boletosSeleccionados.includes(i)) {
-                disponibles.push(i);
-            }
-        }
+        // Obtener boletos disponibles que no estén ya seleccionados
+        const disponibles = this.obtenerBoletosDisponibles();
 
         // Verificar si hay suficientes boletos
+        if (disponibles.length === 0) {
+            alert('No hay boletos disponibles para seleccionar.');
+            return;
+        }
+
         if (disponibles.length < cantidad) {
             alert(`Solo hay ${disponibles.length} boletos disponibles para seleccionar.`);
             cantidad = disponibles.length;
@@ -486,21 +593,23 @@ class BoletosSelector {
         // Recargar para mostrar selección
         this.cargarBoletos();
         this.actualizarSubtotal();
-
         alert(`Se han agregado ${cantidad} boletos a tu selección.`);
     }
 
+    /**
+     * Selecciona boletos aleatorios
+     * @param {number} cantidad - Cantidad de boletos a seleccionar
+     */
     seleccionarAleatorio(cantidad) {
-        // Generar lista de boletos disponibles
-        let disponibles = [];
-        for (let i = 1; i <= this.totalBoletos; i++) {
-            const boleto = this.boletos[i] || { numero: i, estado: 'disponible' };
-            if (boleto.estado === 'disponible' && !this.boletosSeleccionados.includes(i)) {
-                disponibles.push(i);
-            }
-        }
+        // Obtener boletos disponibles que no estén ya seleccionados
+        let disponibles = this.obtenerBoletosDisponibles();
 
         // Verificar si hay suficientes boletos
+        if (disponibles.length === 0) {
+            alert('No hay boletos disponibles para seleccionar aleatoriamente.');
+            return;
+        }
+
         if (disponibles.length < cantidad) {
             alert(`Solo hay ${disponibles.length} boletos disponibles para seleccionar aleatoriamente.`);
             cantidad = disponibles.length;
@@ -508,20 +617,29 @@ class BoletosSelector {
 
         // Mezclar aleatoriamente y seleccionar
         disponibles = disponibles.sort(() => Math.random() - 0.5);
-        for (let i = 0; i < cantidad && i < disponibles.length; i++) {
+        for (let i = 0; i < cantidad; i++) {
             this.boletosSeleccionados.push(disponibles[i]);
         }
 
         // Recargar para mostrar selección
         this.cargarBoletos();
         this.actualizarSubtotal();
-
         alert(`Se han agregado ${cantidad} boletos aleatorios a tu selección.`);
     }
 
+    /**
+     * Selecciona boletos por terminación
+     * @param {number} digito - Dígito de terminación (0-9)
+     */
     seleccionarPorTerminacion(digito) {
+        if (digito < 0 || digito > 9) {
+            alert('Por favor ingrese un dígito válido del 0 al 9');
+            return;
+        }
+
         // Generar lista de boletos que terminan en el dígito especificado
         let boletosTerminacion = [];
+
         for (let i = 1; i <= this.totalBoletos; i++) {
             if (i % 10 === digito) {
                 const boleto = this.boletos[i] || { numero: i, estado: 'disponible' };
@@ -538,21 +656,17 @@ class BoletosSelector {
         }
 
         // Agregar los boletos
-        let boletosAgregados = 0;
-        for (let numero of boletosTerminacion) {
-            if (!this.boletosSeleccionados.includes(numero)) {
-                this.boletosSeleccionados.push(numero);
-                boletosAgregados++;
-            }
-        }
+        boletosTerminacion.forEach(numero => this.boletosSeleccionados.push(numero));
 
         // Recargar para mostrar selección
         this.cargarBoletos();
         this.actualizarSubtotal();
-
-        alert(`Se han agregado ${boletosAgregados} boletos terminados en ${digito}.`);
+        alert(`Se han agregado ${boletosTerminacion.length} boletos terminados en ${digito}.`);
     }
 
+    /**
+     * Limpia todos los boletos seleccionados
+     */
     limpiarSeleccion() {
         if (this.boletosSeleccionados.length === 0) {
             alert('No hay boletos seleccionados para limpiar.');
@@ -565,6 +679,23 @@ class BoletosSelector {
             this.actualizarSubtotal();
             alert('Se ha limpiado tu selección de boletos.');
         }
+    }
+
+    /**
+     * Obtiene lista de boletos disponibles no seleccionados
+     * @returns {number[]} - Array con números de boletos
+     */
+    obtenerBoletosDisponibles() {
+        const disponibles = [];
+
+        for (let i = 1; i <= this.totalBoletos; i++) {
+            const boleto = this.boletos[i] || { numero: i, estado: 'disponible' };
+            if (boleto.estado === 'disponible' && !this.boletosSeleccionados.includes(i)) {
+                disponibles.push(i);
+            }
+        }
+
+        return disponibles;
     }
 }
 
