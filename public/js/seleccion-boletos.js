@@ -395,6 +395,11 @@ class BoletosSelector {
 
             this.gridBoletos.appendChild(boletoDom);
         });
+
+        // Actualizar estado de los botones de filtro
+        this.btnMostrarTodos.classList.remove('active');
+        this.btnMostrarDisponibles.classList.remove('active');
+        this.btnMostrarSeleccionados.classList.add('active');
     }
 
     procederAlPago() {
