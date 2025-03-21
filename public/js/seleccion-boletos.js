@@ -1,7 +1,7 @@
 /**
  * Módulo de selección de boletos para rifas
  * @author Desarrollador
- * @version 2.0
+ * @version 2.1
  */
 class BoletosSelector {
     /**
@@ -10,13 +10,13 @@ class BoletosSelector {
      */
     constructor(options) {
         // Propiedades de configuración
-        this.precio = options.precio;
-        this.totalBoletos = options.totalBoletos;
-        this.boletos = options.boletos;
+        this.precio = options.precio || 0;
+        this.totalBoletos = options.totalBoletos || 0;
+        this.boletos = options.boletos || {};
         this.boletosPorPagina = options.boletosPorPagina || 100;
         this.rifaId = options.rifaId;
-        this.csrfToken = options.csrfToken;
-        this.formAction = options.formAction;
+        this.csrfToken = options.csrfToken || '';
+        this.formAction = options.formAction || '';
 
         // Estado del componente
         this.boletosSeleccionados = [];
@@ -27,16 +27,19 @@ class BoletosSelector {
         // Clasificación de boletos
         this.boletosNoDisponibles = [];
         this.numerosDisponibles = [];
+
+        console.log('BoletosSelector inicializado con', this.totalBoletos, 'boletos totales');
     }
 
     /**
      * Inicializa el selector de boletos
      */
     init() {
+        console.log('Iniciando selector de boletos...');
         this.clasificarBoletos();
         this.configurarDOM();
         this.configurarEventListeners();
-        this.cargarTodosLosBoletos();
+        this.cargarBoletos(); // Cargar directamente sin spinner
         this.actualizarContadorDisponibles();
     }
 
@@ -44,19 +47,34 @@ class BoletosSelector {
      * Clasifica boletos entre disponibles y no disponibles
      */
     clasificarBoletos() {
-        Object.values(this.boletos).forEach(boleto => {
+        this.boletosNoDisponibles = [];
+        this.numerosDisponibles = [];
+
+        // Procesar boletos desde el objeto boletos
+        for (let numero in this.boletos) {
+            const boleto = this.boletos[numero];
             if (boleto.estado !== 'disponible') {
-                this.boletosNoDisponibles.push(boleto.numero);
+                this.boletosNoDisponibles.push(parseInt(numero));
             } else {
-                this.numerosDisponibles.push(boleto.numero);
+                this.numerosDisponibles.push(parseInt(numero));
             }
-        });
+        }
+
+        // Llenar números disponibles que no están en el objeto boletos
+        for (let i = 1; i <= this.totalBoletos; i++) {
+            if (!this.boletos[i] && !this.numerosDisponibles.includes(i)) {
+                this.numerosDisponibles.push(i);
+            }
+        }
+
+        console.log(`Clasificación completada: ${this.numerosDisponibles.length} disponibles, ${this.boletosNoDisponibles.length} no disponibles`);
     }
 
     /**
      * Configura las referencias a elementos del DOM
      */
     configurarDOM() {
+        console.log('Configurando referencias DOM...');
         // Elementos principales
         this.gridBoletos = document.getElementById('boletosGrid');
         this.listaBoletos = document.getElementById('listaBoletos');
@@ -78,9 +96,15 @@ class BoletosSelector {
         this.btnPaginaSiguiente = document.getElementById('paginaSiguiente');
         this.paginadorActual = document.getElementById('paginaActual');
         this.paginadorActualMobile = document.getElementById('paginaActualMobile');
+        this.paginadorInferior = document.getElementById('paginaActualInferior');
+        this.btnPaginaAnteriorInferior = document.getElementById('paginaAnteriorInferior');
+        this.btnPaginaSiguienteInferior = document.getElementById('paginaSiguienteInferior');
 
         // Configuración inicial de filtros
-        this.btnMostrarTodos.classList.add('active');
+        if (this.btnMostrarTodos) this.btnMostrarTodos.classList.add('active');
+
+        // Verificar si se encontraron todos los elementos críticos
+        if (!this.gridBoletos) console.error('Elemento #boletosGrid no encontrado');
     }
 
     /**
@@ -88,22 +112,42 @@ class BoletosSelector {
      */
     configurarEventListeners() {
         // Búsqueda de boletos
-        this.btnBuscar.addEventListener('click', () => this.buscarBoleto());
-        this.inputBuscar.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.buscarBoleto();
-        });
+        if (this.btnBuscar && this.inputBuscar) {
+            this.btnBuscar.addEventListener('click', () => this.buscarBoleto());
+            this.inputBuscar.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.buscarBoleto();
+            });
+        }
 
         // Filtros de visualización
-        this.btnMostrarTodos.addEventListener('click', () => this.filtrarBoletos('todos'));
-        this.btnMostrarDisponibles.addEventListener('click', () => this.filtrarBoletos('disponibles'));
-        this.btnMostrarSeleccionados.addEventListener('click', () => this.filtrarBoletos('seleccionados'));
+        if (this.btnMostrarTodos) {
+            this.btnMostrarTodos.addEventListener('click', () => this.filtrarBoletos('todos'));
+        }
+        if (this.btnMostrarDisponibles) {
+            this.btnMostrarDisponibles.addEventListener('click', () => this.filtrarBoletos('disponibles'));
+        }
+        if (this.btnMostrarSeleccionados) {
+            this.btnMostrarSeleccionados.addEventListener('click', () => this.filtrarBoletos('seleccionados'));
+        }
 
-        // Paginación
-        this.btnPaginaAnterior.addEventListener('click', () => this.cambiarPagina('anterior'));
-        this.btnPaginaSiguiente.addEventListener('click', () => this.cambiarPagina('siguiente'));
+        // Paginación superior
+        if (this.btnPaginaAnterior && this.btnPaginaSiguiente) {
+            this.btnPaginaAnterior.addEventListener('click', () => this.cambiarPagina('anterior'));
+            this.btnPaginaSiguiente.addEventListener('click', () => this.cambiarPagina('siguiente'));
+        }
+
+        // Paginación inferior
+        if (this.btnPaginaAnteriorInferior) {
+            this.btnPaginaAnteriorInferior.addEventListener('click', () => this.cambiarPagina('anterior'));
+        }
+        if (this.btnPaginaSiguienteInferior) {
+            this.btnPaginaSiguienteInferior.addEventListener('click', () => this.cambiarPagina('siguiente'));
+        }
 
         // Proceder al pago
-        this.btnProcederPago.addEventListener('click', () => this.procederAlPago());
+        if (this.btnProcederPago) {
+            this.btnProcederPago.addEventListener('click', () => this.procederAlPago());
+        }
     }
 
     /**
@@ -122,11 +166,7 @@ class BoletosSelector {
 
         // Solo recargar si realmente cambió la página
         if (paginaInicial !== this.paginaActual) {
-            this.setLoadingState(true);
-            setTimeout(() => {
-                this.cargarBoletos();
-                this.setLoadingState(false);
-            }, 300);
+            this.cargarBoletos();
         }
     }
 
@@ -205,20 +245,15 @@ class BoletosSelector {
     }
 
     /**
-     * Carga los boletos iniciales
-     */
-    cargarTodosLosBoletos() {
-        this.setLoadingState(true);
-        setTimeout(() => {
-            this.cargarBoletos();
-            this.setLoadingState(false);
-        }, 300);
-    }
-
-    /**
      * Carga los boletos en el grid según la paginación
      */
     cargarBoletos() {
+        if (!this.gridBoletos) {
+            console.error('No se puede cargar los boletos: gridBoletos es null');
+            return;
+        }
+
+        console.log('Cargando boletos para página', this.paginaActual);
         this.gridBoletos.innerHTML = '';
         this.actualizarPaginadores();
 
@@ -235,6 +270,7 @@ class BoletosSelector {
         const fragment = document.createDocumentFragment();
 
         for (let i = inicio; i <= fin; i++) {
+            // Determine si el boleto existe en los datos o crear uno predeterminado
             const boleto = this.boletos[i] || { numero: i, estado: 'disponible' };
             const estaDisponible = boleto.estado === 'disponible';
 
@@ -261,18 +297,25 @@ class BoletosSelector {
 
         this.actualizarEstadoPaginacion();
         this.actualizarContadorGrid(contadorBoletos);
+
+        console.log(`Boletos cargados: ${contadorBoletos} mostrados, ${contadorDisponibles} disponibles`);
     }
 
     /**
      * Actualiza todos los paginadores
      */
     actualizarPaginadores() {
-        const textoPagina = `Página ${this.paginaActual}`;
-        this.paginadorActual.textContent = textoPagina;
+        const totalPaginas = Math.ceil(this.totalBoletos / this.boletosPorPagina);
+        const textoPagina = `Página ${this.paginaActual} de ${totalPaginas}`;
 
-        if (this.paginadorActualMobile) {
-            this.paginadorActualMobile.textContent = textoPagina;
-        }
+        // Actualizar paginador superior
+        if (this.paginadorActual) this.paginadorActual.textContent = textoPagina;
+
+        // Actualizar paginador móvil
+        if (this.paginadorActualMobile) this.paginadorActualMobile.textContent = textoPagina;
+
+        // Actualizar paginador inferior
+        if (this.paginadorInferior) this.paginadorInferior.textContent = textoPagina;
     }
 
     /**
@@ -280,8 +323,18 @@ class BoletosSelector {
      */
     actualizarEstadoPaginacion() {
         const totalPaginas = Math.ceil(this.totalBoletos / this.boletosPorPagina);
+
+        // Paginación superior
         this.btnPaginaAnterior.disabled = this.paginaActual <= 1;
         this.btnPaginaSiguiente.disabled = this.paginaActual >= totalPaginas;
+
+        // Paginación inferior
+        if (this.btnPaginaAnteriorInferior) {
+            this.btnPaginaAnteriorInferior.disabled = this.paginaActual <= 1;
+        }
+        if (this.btnPaginaSiguienteInferior) {
+            this.btnPaginaSiguienteInferior.disabled = this.paginaActual >= totalPaginas;
+        }
     }
 
     /**

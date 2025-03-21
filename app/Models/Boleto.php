@@ -13,7 +13,8 @@ class Boleto extends Model
         'numero',
         'estado',
         'cliente_id',
-        'reservado_hasta'
+        'reservado_hasta',
+        'telefono_cliente',
     ];
 
     protected $casts = [

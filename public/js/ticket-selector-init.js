@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar eventos de selección avanzada
     configurarSeleccionAvanzada(boletosApp);
 
+    // Configurar botón de selección rápida en el estado vacío
+    const btnSeleccionRapida = document.getElementById('btnSeleccionRapida');
+    if (btnSeleccionRapida) {
+        btnSeleccionRapida.addEventListener('click', function() {
+            modalSeleccionRapida.show();
+        });
+    }
+
     // Exponer el objeto para uso externo si es necesario
     window.boletosApp = boletosApp;
 });

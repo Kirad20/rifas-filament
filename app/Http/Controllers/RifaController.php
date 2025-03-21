@@ -121,6 +121,9 @@ class RifaController extends Controller
             // Guardar el token del carrito en la sesión
             Session::put('carrito_token', $carrito->token);
 
+            // Guardar el teléfono del usuario en la sesión para futura referencia
+            Session::put('telefono_cliente', $telefono);
+
             // Crear o actualizar el item del carrito para esta rifa
             $carritoItem = CarritoItem::firstOrNew([
                 'carrito_id' => $carrito->id,
@@ -144,6 +147,7 @@ class RifaController extends Controller
                 ->update([
                     'estado' => 'reservado_temp',
                     'reservado_hasta' => Carbon::now()->addHours(1), // Reserva temporal por 1 hora
+                    'telefono_reserva' => $telefono, // Guardar el teléfono que hizo la reserva
                 ]);
 
             DB::commit();
