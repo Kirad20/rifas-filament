@@ -14,6 +14,7 @@ class BoletosAppManager {
         this.telefonoGuardado = localStorage.getItem('telefono_cliente');
         this.modalTelefono = null;
         this.modalSeleccionRapida = null;
+        this.storageKey = `boletos_seleccionados_${this.boletosApp.rifaId}`;
     }
 
     /**
@@ -35,6 +36,90 @@ class BoletosAppManager {
 
         // Reemplazar método procederAlPago con versión mejorada
         this.mejorarProcesoPago();
+
+        // Reemplazar el método toggleSeleccionBoleto para guardar en localStorage
+        this.mejorarSeleccionBoletos();
+
+        // Recuperar selección de localStorage
+        this.recuperarBoletosDeSesion();
+
+        // Mostrar formulario de teléfono si no está autenticado y no tiene teléfono guardado
+        this.mostrarFormularioTelefonoSiNecesario();
+    }
+
+    /**
+     * Muestra el formulario de teléfono al cargar la página si es necesario
+     * Esta función ahora está manejada por modal-handler.js
+     */
+    mostrarFormularioTelefonoSiNecesario() {
+        // La función ahora está vacía ya que la muestra modal-handler.js automáticamente
+        // basándose en el atributo data-user-logged del body y localStorage
+    }
+
+    /**
+     * Mejora el método de selección de boletos para guardar en localStorage
+     */
+    mejorarSeleccionBoletos() {
+        // Guardar referencia al método original
+        const toggleSeleccionBoletoOriginal = this.boletosApp.toggleSeleccionBoleto;
+
+        // Reemplazar con versión mejorada
+        this.boletosApp.toggleSeleccionBoleto = (numero) => {
+            // Llamar al método original
+            toggleSeleccionBoletoOriginal.call(this.boletosApp, numero);
+
+            // Guardar en localStorage
+            this.guardarBoletosEnSesion();
+        };
+    }
+
+    /**
+     * Guarda los boletos seleccionados en localStorage
+     */
+    guardarBoletosEnSesion() {
+        try {
+            localStorage.setItem(
+                this.storageKey,
+                JSON.stringify(this.boletosApp.boletosSeleccionados)
+            );
+        } catch (error) {
+            console.error('Error al guardar selección en localStorage:', error);
+        }
+    }
+
+    /**
+     * Recupera los boletos seleccionados de localStorage
+     */
+    recuperarBoletosDeSesion() {
+        try {
+            const boletosGuardados = localStorage.getItem(this.storageKey);
+            if (boletosGuardados) {
+                const boletosArray = JSON.parse(boletosGuardados);
+
+                // Verificar que los boletos guardados todavía estén disponibles
+                const boletosDisponibles = boletosArray.filter(numero => {
+                    const boleto = this.boletosApp.boletos[numero] || { estado: 'disponible' };
+                    return boleto.estado === 'disponible';
+                });
+
+                // Asignar los boletos disponibles a la selección actual
+                this.boletosApp.boletosSeleccionados = boletosDisponibles;
+
+                // Actualizar interfaz
+                if (boletosDisponibles.length > 0) {
+                    console.log(`Recuperados ${boletosDisponibles.length} boletos de localStorage`);
+                    this.boletosApp.cargarBoletos();
+                    this.boletosApp.actualizarSubtotal();
+                }
+
+                // Si hay boletos que ya no están disponibles, actualizar localStorage
+                if (boletosDisponibles.length < boletosArray.length) {
+                    this.guardarBoletosEnSesion();
+                }
+            }
+        } catch (error) {
+            console.error('Error al recuperar selección de localStorage:', error);
+        }
     }
 
     /**
@@ -53,23 +138,44 @@ class BoletosAppManager {
      * Configura los modales
      */
     configurarModales() {
-        // Modal de selección rápida
-        const modalElement = document.getElementById('modalSeleccionRapida');
-        if (modalElement) {
-            modalElement.style.display = 'none';
-            this.modalSeleccionRapida = new bootstrap.Modal(modalElement);
-            this.configurarBotonesModalSeleccion();
+        // Usar las instancias ya inicializadas en el script en la plantilla
+        if (window.modalSeleccionRapidaInstance) {
+            this.modalSeleccionRapida = window.modalSeleccionRapidaInstance;
+            console.log('Usando instancia de modalSeleccionRapida de la vista');
+        } else {
+            // Inicialización de respaldo
+            try {
+                const modalElement = document.getElementById('modalSeleccionRapida');
+                if (modalElement && typeof bootstrap !== 'undefined') {
+                    this.modalSeleccionRapida = new bootstrap.Modal(modalElement);
+                }
+            } catch (error) {
+                console.error('Error inicializando modalSeleccionRapida:', error);
+            }
         }
 
-        // Modal de teléfono
-        const modalTelefonoElement = document.getElementById('modalTelefono');
-        if (modalTelefonoElement) {
-            this.modalTelefono = new bootstrap.Modal(modalTelefonoElement, {
-                backdrop: 'static',
-                keyboard: false
-            });
-            this.configurarFormularioTelefono();
+        if (window.modalTelefonoInstance) {
+            this.modalTelefono = window.modalTelefonoInstance;
+            console.log('Usando instancia de modalTelefono de la vista');
+        } else {
+            // Inicialización de respaldo
+            try {
+                const modalTelefonoElement = document.getElementById('modalTelefono');
+                if (modalTelefonoElement && typeof bootstrap !== 'undefined') {
+                    this.modalTelefono = new bootstrap.Modal(modalTelefonoElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                }
+            } catch (error) {
+                console.error('Error inicializando modalTelefono:', error);
+            }
         }
+
+        // Configurar botones del modal de selección rápida
+        this.configurarBotonesModalSeleccion();
+
+        // Formulario de teléfono ya configurado en la plantilla
 
         // Prellenar el campo de teléfono si existe en localStorage
         if (this.telefonoGuardado && document.getElementById('inputTelefono')) {
@@ -147,8 +253,12 @@ class BoletosAppManager {
                 // Ocultar modal
                 this.modalTelefono.hide();
 
-                // Proceder con la compra incluyendo el teléfono
-                this.procesarCompraTelefono(telefono);
+                // Si vino del inicio del flujo, simplemente continuar
+                // Si vino de procederAlPago, entonces procesarCompraTelefono
+                if (this.procesandoCompra) {
+                    this.procesarCompraTelefono(telefono);
+                    this.procesandoCompra = false;
+                }
             });
         }
     }
@@ -306,9 +416,10 @@ class BoletosAppManager {
                                 numero => boletosDisponibles.has(parseInt(numero))
                             );
 
-                            // Actualizar la interfaz
+                            // Actualizar la interfaz y localStorage
                             this.boletosApp.actualizarSubtotal();
                             this.boletosApp.cargarBoletos();
+                            this.guardarBoletosEnSesion();
 
                             // Si todavía quedan boletos seleccionados, verificamos inicio de sesión
                             if (this.boletosApp.boletosSeleccionados.length > 0) {
@@ -351,9 +462,25 @@ class BoletosAppManager {
                 this.procesarCompraTelefono(this.telefonoGuardado);
             } else {
                 // Si no está logueado o no tiene teléfono guardado, mostrar modal
-                this.modalTelefono.show();
+                this.procesandoCompra = true; // Flag para saber que venimos de procederAlPago
+
+                if (this.modalTelefono) {
+                    console.log('Mostrando modal desde verificarSesionUsuario');
+                    this.modalTelefono.show();
+                } else {
+                    // Fallback usando la instancia global
+                    if (window.modalTelefonoInstance) {
+                        console.log('Mostrando modalTelefonoInstance desde verificarSesionUsuario');
+                        window.modalTelefonoInstance.show();
+                    } else {
+                        alert('No se pudo mostrar el formulario de teléfono. Por favor, refresca la página e inténtalo de nuevo.');
+                    }
+                }
             }
         }
+
+        // Limpiar la selección de localStorage cuando procede al pago
+        localStorage.removeItem(this.storageKey);
     }
 
     /**
@@ -394,6 +521,10 @@ class BoletosAppManager {
 
         // Agregar formulario al documento y enviarlo
         document.body.appendChild(form);
+
+        // Eliminar selección del localStorage antes de enviar el formulario
+        localStorage.removeItem(this.storageKey);
+
         form.submit();
     }
 

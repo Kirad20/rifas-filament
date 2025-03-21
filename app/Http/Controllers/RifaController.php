@@ -75,11 +75,26 @@ class RifaController extends Controller
     {
         $rifa = Rifa::findOrFail($id);
 
+        // Obtener el teléfono del usuario de la sesión si existe
+        $telefonoCliente = Session::get('telefono_cliente');
+
         // Obtener los números de boletos disponibles
-        $boletosDisponibles = Boleto::where('rifa_id', $id)
-            ->where('estado', 'disponible')
-            ->pluck('numero')
-            ->toArray();
+        // Si hay teléfono en sesión, incluir también los que están reservados por este teléfono
+        $query = Boleto::where('rifa_id', $id)
+            ->where(function($query) use ($telefonoCliente) {
+                $query->where('estado', 'disponible');
+
+                // Si hay teléfono en la sesión, incluir los boletos reservados por este teléfono
+                if ($telefonoCliente) {
+                    $query->orWhere(function($q) use ($telefonoCliente) {
+                        $q->where('estado', 'reservado_temp')
+                          ->where('telefono_reserva', $telefonoCliente)
+                          ->where('reservado_hasta', '>', now());
+                    });
+                }
+            });
+
+        $boletosDisponibles = $query->pluck('numero')->toArray();
 
         return response()->json($boletosDisponibles);
     }
@@ -102,14 +117,22 @@ class RifaController extends Controller
             return redirect()->back()->with('error', 'No has seleccionado ningún boleto.');
         }
 
-        // Verificar que todos los boletos estén disponibles
+        // Verificar que todos los boletos estén disponibles o ya estén reservados por este teléfono
         $boletosDisponibles = Boleto::where('rifa_id', $id)
-            ->where('estado', 'disponible')
+            ->where(function($query) use ($telefono) {
+                $query->where('estado', 'disponible')
+                      ->orWhere(function($q) use ($telefono) {
+                          $q->where('estado', 'reservado_temp')
+                            ->where('telefono_reserva', $telefono)
+                            ->where('reservado_hasta', '>', now());
+                      });
+            })
             ->whereIn('numero', $boletosSeleccionados)
             ->count();
 
+        // Verificar que todos los boletos seleccionados estén disponibles o sean del mismo teléfono
         if ($boletosDisponibles !== count($boletosSeleccionados)) {
-            return redirect()->back()->with('error', 'Algunos boletos seleccionados ya no están disponibles.');
+            return redirect()->back()->with('error', 'Algunos boletos seleccionados ya no están disponibles o están reservados por otro usuario.');
         }
 
         try {

@@ -2,6 +2,33 @@
 
 @section('title', 'Selección de Boletos - ' . $rifa->nombre)
 
+@section('styles')
+<link rel="stylesheet" href="{{ asset('css/ticket-selector.css') }}">
+<style>
+/* Estilos críticos para modales */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1055;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+}
+</style>
+@endsection
+
 @php
     // Definir la variable de estado de autenticación aquí para evitar problemas de sintaxis
     $authCheckStatus = Auth::check() ? 'true' : 'false';
@@ -39,15 +66,14 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('footer_content')
 <!-- Herramientas flotantes y paneles -->
 @include('rifas.components.ticket-tools-panel')
 
-<!-- Modales -->
+<!-- Modales (fuera del contenedor principal) -->
 @include('rifas.components.ticket-modals', ['rifa' => $rifa])
-
-<!-- Incluir estilos CSS -->
-<link rel="stylesheet" href="{{ asset('css/ticket-selector.css') }}">
 
 <!-- Incluir Bootstrap JS antes de nuestros scripts personalizados -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
