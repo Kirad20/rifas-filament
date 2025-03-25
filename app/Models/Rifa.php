@@ -15,7 +15,7 @@ class Rifa extends Model implements HasMedia
     protected $fillable = [
         'nombre',
         'descripcion',
-        'precio',
+        'precio_boleto',
         'imagen_url',
         'fecha_sorteo',
         'boletos_totales',
@@ -46,6 +46,9 @@ class Rifa extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('portada')
+            ->singleFile();
+
         $this->addMediaCollection('fotos');
     }
 
@@ -68,5 +71,29 @@ class Rifa extends Model implements HasMedia
     public function getEsPopularAttribute()
     {
         return $this->porcentaje_vendido > 70;
+    }
+
+    /**
+     * Obtiene el total de boletos para esta rifa
+     *
+     * @return int
+     */
+    public function getTotalBoletosAttribute($value)
+    {
+        // Si el valor está establecido en la base de datos, úsalo
+        if (!empty($value) && is_numeric($value) && $value > 0) {
+            return $value;
+        }
+
+        // Contar los boletos existentes para esta rifa
+        $totalBoletos = Boleto::where('rifa_id', $this->id)->count();
+
+        // Si hay boletos, devolver ese número
+        if ($totalBoletos > 0) {
+            return $totalBoletos;
+        }
+
+        // Valor predeterminado si no hay boletos registrados
+        return 100;
     }
 }

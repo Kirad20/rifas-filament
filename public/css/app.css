@@ -1,29 +1,29 @@
 :root {
     /* Paleta de colores principales - modifique estas variables para cambiar el esquema de colores */
-    --color-primary: #ff6b00;
-    --color-primary-light: #ff8c33;
-    --color-primary-dark: #e65a00;
+    --color-primary: #a0ce2b; /* Verde lima brillante */
+    --color-primary-light: #b6d758;
+    --color-primary-dark: #87af22;
 
-    --color-secondary: #1a2b49;
-    --color-secondary-light: #2c3e5d;
-    --color-secondary-dark: #0e1b30;
+    --color-secondary: #4a9a3f; /* Verde medio */
+    --color-secondary-light: #5bb24d;
+    --color-secondary-dark: #3b8332;
 
-    --color-accent: #ffd700;
-    --color-accent-light: #ffe033;
-    --color-accent-dark: #e6c200;
+    --color-accent: #072702; /* Verde muy oscuro */
+    --color-accent-light: #0f4105;
+    --color-accent-dark: #051a01;
 
     --color-bg-light: #f9f9f9;
-    --color-bg-dark: #111827;
+    --color-bg-dark: #072702;
 
-    --color-text-dark: #222222;
-    --color-text-light: #f9f9f9;
+    --color-text-dark: #072702; /* Verde oscuro para texto en fondos claros */
+    --color-text-light: #f9f9f9; /* Gris muy claro para texto en fondos oscuros */
     --color-text-muted: #6b7280;
 
-    --color-border: #e5e7eb;
-    --color-success: #10b981;
-    --color-danger: #ef4444;
-    --color-warning: #f59e0b;
-    --color-info: #3b82f6;
+    --color-border: #e0e8d6;
+    --color-success: #4a9a3f; /* Reutilizamos el verde medio para éxito */
+    --color-danger: #d32f2f; /* Mantenemos un rojo para errores */
+    --color-warning: #f9a825; /* Un amarillo cálido para advertencias */
+    --color-info: #4a9a3f; /* Verde medio para información */
 
     /* Tamaños y radios estándar */
     --border-radius-sm: 0.25rem;
@@ -109,17 +109,18 @@ a:hover {
 
 .btn-primario {
     background-color: var(--color-primary);
-    color: var(--color-text-light);
+    color: var(--color-accent); /* Verde oscuro sobre verde lima para mejor contraste */
+    font-weight: 700;
 }
 
 .btn-primario:hover {
     background-color: var(--color-primary-dark);
-    color: var(--color-text-light);
+    color: var(--color-text-dark);
 }
 
 .btn-secundario {
     background-color: var(--color-secondary);
-    color: var (--color-text-light);
+    color: var(--color-text-light);
 }
 
 .btn-secundario:hover {
@@ -131,16 +132,17 @@ a:hover {
     background-color: transparent;
     border: 2px solid var(--color-primary);
     color: var(--color-primary);
+    font-weight: 700;
 }
 
 .btn-outline:hover {
     background-color: var(--color-primary);
-    color: var(--color-text-light);
+    color: var(--color-accent);
 }
 
 /* Cabecero y navegación */
 .cabecero {
-    background-color: var(--color-secondary);
+    background-color: var(--color-accent);
     color: var(--color-text-light);
     padding: 1rem 0;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -203,7 +205,7 @@ a:hover {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(26, 43, 73, 0.8), rgba(26, 43, 73, 0.9)), url('../img/hero-bg.jpg');
+    background: linear-gradient(rgba(7, 39, 2, 0.85), rgba(7, 39, 2, 0.9)), url('../img/hero-bg.jpg');
     background-size: cover;
     background-position: center;
     color: var(--color-text-light);
@@ -233,7 +235,7 @@ a:hover {
 /* Estadísticas */
 .estadisticas {
     background-color: var(--color-primary);
-    color: var(--color-text-light);
+    color: var(--color-text-dark);
     padding: 3rem 0;
     text-align: center;
 }
@@ -295,7 +297,7 @@ a:hover {
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--color-primary);
-    color: white;
+    color: var(--color-accent);
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -365,8 +367,8 @@ a:hover {
 }
 
 .rifa-precio {
-    color: var(--color-primary);
-    font-weight: 600;
+    color: var(--color-secondary);
+    font-weight: 700;
     margin-bottom: 1rem;
 }
 
@@ -465,12 +467,13 @@ a:hover {
 
 .faq-pregunta {
     padding: 1rem 1.5rem;
-    background-color: #f9fafb;
+    background-color: #f0f5e6; /* Un fondo muy claro con tinte verde */
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: 600;
+    color: var(--color-text-dark);
 }
 
 .faq-respuesta {
@@ -487,7 +490,7 @@ a:hover {
 
 /* Footer */
 .pie-pagina {
-    background-color: var(--color-secondary);
+    background-color: var(--color-accent);
     color: var(--color-text-light);
     padding: 4rem 0 2rem;
 }
@@ -607,4 +610,267 @@ a:hover {
 .py-5 {
     padding-top: 3rem;
     padding-bottom: 3rem;
+}
+
+/* Estilos para Rifas */
+.breadcrumb {
+    display: flex;
+    list-style: none;
+    padding: 0.5rem 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    padding: 0 0.5rem;
+    color: var(--color-text-muted);
+}
+
+.breadcrumb-item a {
+    color: var(--color-secondary);
+}
+
+.breadcrumb-item.active {
+    color: var(--color-text-muted);
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.bg-primary {
+    background-color: var(--color-primary);
+    color: var(--color-accent);
+}
+
+.bg-secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-text-light);
+}
+
+.bg-success {
+    background-color: var(--color-success);
+    color: var(--color-text-light);
+}
+
+.bg-danger {
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.bg-warning {
+    background-color: var(--color-warning);
+    color: white;
+}
+
+.bg-info {
+    background-color: var(--color-info);
+    color: white;
+}
+
+.alert {
+    position: relative;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+}
+
+.alert-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: var(--color-info);
+}
+
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: var(--color-success);
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: var(--color-danger);
+}
+
+.alert-secondary {
+    background-color: rgba(107, 114, 128, 0.1);
+    border-color: rgba(107, 114, 128, 0.25);
+    color: var(--color-text-muted);
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -1rem;
+    margin-left: -1rem;
+}
+
+.col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+
+.col-1 {
+    flex: 0 0 calc(100% / 12);
+    max-width: calc(100% / 12);
+}
+
+.gx-2 {
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+.gx-2 > [class*="col"] {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.gy-2 {
+    margin-top: -0.5rem;
+    margin-bottom: -0.5rem;
+}
+
+.gy-2 > [class*="col"] {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.rounded {
+    border-radius: var(--border-radius);
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+}
+
+.card-body {
+    flex: 1 1 auto;
+    padding: 1.5rem;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--color-text-dark);
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid var(--color-border);
+    appearance: none;
+    border-radius: var(--border-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--color-primary-light);
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(var(--color-primary), 0.25);
+}
+
+.is-invalid {
+    border-color: var(--color-danger);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: var(--color-danger);
+}
+
+.text-danger {
+    color: var(--color-danger);
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .navegacion.activo {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--color-secondary-dark);
+        width: 200px;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+
+    .navegacion.activo ul {
+        flex-direction: column;
+    }
+
+    .navegacion.activo li {
+        margin: 0.5rem 0;
+    }
+}
+
+/* Fix para el menú móvil */
+@media (max-width: 767px) {
+    .navegacion.activo {
+        display: block;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: var(--color-secondary);
+        padding: 1rem;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+    }
+
+    .navegacion.activo ul {
+        flex-direction: column;
+    }
+
+    .navegacion.activo li {
+        margin: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Estilo para las secciones */
+.info-seccion {
+    margin-top: 1.5rem;
 }

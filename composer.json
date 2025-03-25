@@ -12,14 +12,17 @@
         "php": "^8.2",
         "awcodes/filament-curator": "^3.7",
         "dutchcodingcompany/filament-developer-logins": "^1.8",
-        "filament/filament": "^3.3",
+        "filament/filament": "^3.0",
+        "filament/forms": "^3.0",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "laravel/framework": "^11.31",
+        "laravel/telescope": "^5.6",
         "laravel/tinker": "^2.9",
         "miguilim/filament-auto-panel": "^2.0",
         "tomatophp/filament-settings-hub": "^2.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.13",

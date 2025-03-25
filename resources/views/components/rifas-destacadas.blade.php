@@ -1,17 +1,8 @@
-@extends('layouts.app')
+<section class="rifas-destacadas">
+    <div class="container">
+        <h2>Rifas Destacadas</h2>
 
-@section('title', 'Todas las Rifas - Concursos y Sorteos San Miguel')
-
-@section('content')
-    <div class="container py-5">
-        <h1 class="text-center mb-5">Todas nuestras rifas</h1>
-
-        @if($rifas->isEmpty())
-            <div class="rifas-mensaje">
-                <p>No hay rifas disponibles en este momento.</p>
-                <p>Vuelve pronto para ver nuestros nuevos sorteos.</p>
-            </div>
-        @else
+        @if(isset($rifas) && count($rifas) > 0)
             <div class="rifas-grid">
                 @foreach($rifas as $rifa)
                     <div class="rifa-card">
@@ -34,10 +25,14 @@
                     </div>
                 @endforeach
             </div>
-
-            <div class="paginacion mt-5">
-                {{ $rifas->links() }}
+        @else
+            <div class="rifas-mensaje">
+                <p>No hay rifas destacadas disponibles en este momento.</p>
             </div>
         @endif
+
+        <div class="ver-mas">
+            <a href="{{ route('rifas.index') }}" class="btn btn-secundario">Ver todas las rifas →</a>
+        </div>
     </div>
-@endsection
+</section>

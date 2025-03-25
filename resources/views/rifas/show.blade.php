@@ -1,75 +1,189 @@
 @extends('layouts.app')
 
-@section('title', $rifa->nombre)
+@section('title', $rifa->nombre . ' - Concursos y Sorteos San Miguel')
 
 @section('content')
-    <div class="container mx-auto px-4 py-12">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="md:flex">
-                <div class="md:w-1/2">
-                    @if ($rifa->imagen)
-                        <img src="{{ asset('storage/' . $rifa->imagen) }}" alt="{{ $rifa->nombre }}"
-                            class="w-full h-80 object-cover">
-                    @else
-                        <div class="w-full h-80 bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-400">Sin imagen</span>
-                        </div>
-                    @endif
-                </div>
-                <div class="p-8 md:w-1/2">
-                    <h1 class="text-3xl font-bold mb-4">{{ $rifa->nombre }}</h1>
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('rifas.index') }}">Rifas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $rifa->nombre }}</li>
+        </ol>
+    </nav>
 
-                    <div class="mb-6">
-                        <div class="flex items-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span class="text-gray-700">Fecha del sorteo:
-                                <strong>{{ \Carbon\Carbon::parse($rifa->fecha_sorteo)->format('d/m/Y') }}</strong></span>
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Carousel de imágenes -->
+            <div class="rifa-carousel">
+                <div class="carousel-main mb-3">
+                    <img src="{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}"
+                        alt="{{ $rifa->nombre }}" class="img-fluid rounded active-img" id="featured-img">
+                </div>
+
+                @if($rifa->getMedia('fotos')->count() > 0)
+                <div class="carousel-thumbs">
+                    <div class="thumb-container">
+                        <!-- Imagen de portada también como miniatura -->
+                        <div class="thumb-item active">
+                            <img src="{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}"
+                                alt="{{ $rifa->nombre }}" class="img-thumbnail"
+                                onclick="changeImage('{{ $rifa->getFirstMediaUrl('portada') ?: asset('img/placeholder.jpg') }}', this)">
                         </div>
-                        <div class="flex items-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                            </svg>
-                            <span class="text-gray-700">Boletos disponibles:
-                                <strong>{{ $rifa->boletos_disponibles }}</strong></span>
+
+                        <!-- Imágenes adicionales de la colección 'fotos' -->
+                        @foreach($rifa->getMedia('fotos') as $media)
+                        <div class="thumb-item">
+                            <img src="{{ $media->getUrl() }}"
+                                alt="{{ $rifa->nombre }}" class="img-thumbnail"
+                                onclick="changeImage('{{ $media->getUrl() }}', this)">
                         </div>
+                        @endforeach
                     </div>
-
-                    <div class="mb-8">
-                        <span class="text-3xl font-bold text-amber-500">${{ number_format($rifa->precio_boleto, 2) }}</span>
-                        <span class="text-gray-500 ml-2">por boleto</span>
-                    </div>
-
-                    <a href="{{ route('boletos.seleccionar', $rifa) }}"
-                        class="bg-amber-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-600 transition w-full md:w-auto text-center">
-                        Comprar boleto
-                    </a>
                 </div>
-            </div>
-
-            <div class="p-8 border-t">
-                <h2 class="text-2xl font-bold mb-4">Descripción</h2>
-                <div class="prose max-w-none">
-                    {!! $rifa->descripcion !!}
-                </div>
-            </div>
-
-            <div class="p-8 border-t bg-gray-50">
-                <h2 class="text-2xl font-bold mb-4">Términos y condiciones</h2>
-                <div class="prose max-w-none">
-                    <ul>
-                        <li>El sorteo se realizará en la fecha indicada, sin posibilidad de cambios.</li>
-                        <li>El ganador será notificado por correo electrónico y teléfono.</li>
-                        <li>El premio deberá ser reclamado en un plazo máximo de 30 días.</li>
-                        <li>No se aceptan devoluciones 48 horas antes del sorteo.</li>
-                    </ul>
-                </div>
+                @endif
             </div>
         </div>
+        <div class="col-md-6">
+            <h1>{{ $rifa->nombre }}</h1>
+
+            <div class="mb-4">
+                <div class="badge bg-primary mb-2">Precio por boleto: ${{ number_format($rifa->precio, 2) }} MXN</div>
+
+                @if($rifa->estado === 'activa')
+                    <div class="badge bg-success">Activa</div>
+                @elseif($rifa->estado === 'finalizada')
+                    <div class="badge bg-secondary">Finalizada</div>
+                @elseif($rifa->estado === 'cancelada')
+                    <div class="badge bg-danger">Cancelada</div>
+                @endif
+            </div>
+
+            <div class="rifa-progreso mb-3" style="height: 10px;">
+                <div class="rifa-progreso-barra" style="width: {{ ($rifa->total_boletos > 0) ? (($rifa->boletos_vendidos / $rifa->total_boletos) * 100) : 0 }}%"></div>
+            </div>
+            <p class="mb-4">
+                <strong>Avance de venta:</strong> {{ $rifa->boletos_vendidos }} de {{ $rifa->total_boletos }} boletos vendidos
+                ({{ $rifa->total_boletos > 0 ? number_format(($rifa->boletos_vendidos / $rifa->total_boletos) * 100, 1) : 0 }}%)
+            </p>
+
+            <p class="mb-4">
+                <i class="far fa-calendar-alt me-2"></i>
+                <strong>Fecha del sorteo:</strong> {{ \Carbon\Carbon::parse($rifa->fecha_sorteo)->format('d/m/Y H:i') }}
+            </p>
+
+            <div class="mb-4">
+                <h5>Descripción</h5>
+                <p>{{ $rifa->descripcion }}</p>
+            </div>
+
+            @if($rifa->estado === 'activa')
+                <a href="{{ route('rifas.seleccionar-boletos', $rifa->id) }}" class="btn btn-primario btn-lg">Comprar boletos</a>
+            @elseif($rifa->estado === 'finalizada')
+                <div class="alert alert-secondary">
+                    Esta rifa ya ha finalizado. Consulta los resultados en nuestra sección de ganadores.
+                </div>
+            @elseif($rifa->estado === 'cancelada')
+                <div class="alert alert-danger">
+                    Esta rifa ha sido cancelada.
+                </div>
+            @endif
+        </div>
     </div>
+</div>
+
+<style>
+    .boleto-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        background-color: #fff;
+        border: 1px solid var(--color-primary);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .boleto-item:not(.vendido):hover {
+        background-color: var(--color-primary);
+        color: white;
+    }
+
+    .boleto-item.vendido {
+        background-color: #e5e7eb;
+        border-color: #d1d5db;
+        color: #9ca3af;
+        cursor: not-allowed;
+        position: relative;
+    }
+
+    .boleto-item.vendido::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #9ca3af;
+    }
+
+    .carousel-main {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .carousel-main img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+
+    .carousel-thumbs {
+        width: 100%;
+        overflow-x: auto;
+        padding: 10px 0;
+    }
+
+    .thumb-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    .thumb-item {
+        flex: 0 0 auto;
+        width: 80px;
+        height: 80px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.3s;
+    }
+
+    .thumb-item.active {
+        opacity: 1;
+        border: 2px solid var(--color-primary);
+    }
+
+    .thumb-item:hover {
+        opacity: 1;
+    }
+
+    .thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+
+<script>
+    function changeImage(src, element) {
+        // Cambiar la imagen principal
+        document.getElementById('featured-img').src = src;
+
+        // Actualizar la clase activa en las miniaturas
+        const thumbs = document.querySelectorAll('.thumb-item');
+        thumbs.forEach(thumb => thumb.classList.remove('active'));
+        element.parentElement.classList.add('active');
+    }
+</script>
 @endsection
